@@ -1,3 +1,12 @@
-<svg width="16px" height="16px" viewBox="0 0 16 16" class="bi bi-collection" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path fill-rule="evenodd" d="M14.5 13.5h-13A.5.5 0 0 1 1 13V6a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5zm-13 1A1.5 1.5 0 0 1 0 13V6a1.5 1.5 0 0 1 1.5-1.5h13A1.5 1.5 0 0 1 16 6v7a1.5 1.5 0 0 1-1.5 1.5h-13zM2 3a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 0-1h-11A.5.5 0 0 0 2 3zm2-2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7A.5.5 0 0 0 4 1z"/>
+<svg width="250" height="250" viewBox="0 0 250 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_14_17)">
+<rect x="20" y="107" width="210" height="123" rx="37" stroke="#FF334D" stroke-width="40"/>
+<rect x="85" width="80" height="30" fill="#FF334D"/>
+<path d="M50 43H200V73H50V43Z" fill="#FF334D"/>
+</g>
+<defs>
+<clipPath id="clip0_14_17">
+<rect width="250" height="250" fill="white"/>
+</clipPath>
+</defs>
 </svg>

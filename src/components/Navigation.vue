@@ -1,5 +1,6 @@
 <style scoped lang="scss">
 .navigation {
+    margin-bottom: 30px;
     padding: 20px 0;
     display: flex;
     gap: 30px;
