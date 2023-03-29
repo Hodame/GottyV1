@@ -1,6 +1,8 @@
 <template>
     <div class="sidebar">
-        <div class="sidebar__home">Home</div>
+        <RouterLink style="color: var(--white);"  :to="{ name: routeNames.Home}">
+            <div class="sidebar__home">Home</div>
+        </RouterLink>
         <div class="sidebar__profile">
             <div class="sidebar__user">
                 <p>hodame</p>
@@ -101,5 +103,5 @@
 </template>
 
 <script setup lang="ts">
-
+import { routeNames } from '../router/routeNames';
 </script>

@@ -1,18 +1,18 @@
-import { createRouter, createWebHashHistory} from "vue-router"
+import { createRouter, createWebHistory} from "vue-router"
 import { routeNames } from "./routeNames"
 
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes: [
         {
             path: "/auth",
             name: routeNames.Auth,
+            component: {template: "<h1>test</h1>"}
         },
         {
             path: "/layout",
             name: routeNames.Layout,
             component: () => import("../pages/Main.vue"),
-            redirect: { name: routeNames.Home },
             children: [
                 {
                     path:"/",
@@ -20,7 +20,7 @@ const router = createRouter({
                     component: () => import("../pages/Home.vue"),
                 },
                 {
-                    path:"/:gameId",
+                    path:"/game/:gameId",
                     name: routeNames.GamePage,
                     component: () => import("../pages/GamePage.vue"),
                 }

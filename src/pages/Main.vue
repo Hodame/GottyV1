@@ -17,6 +17,7 @@ import SideBar from '../components/SideBar.vue'
 
 <style scoped lang="scss">
 .body {
+  height: 100%;
   max-width: 2000px;
   margin: 0 auto;
   padding: 0 25px;
@@ -25,6 +26,7 @@ import SideBar from '../components/SideBar.vue'
   &__container {
     display: grid;
     grid-template-columns: 250px 1fr;
+    height: 100%;
   }
 }
 </style>

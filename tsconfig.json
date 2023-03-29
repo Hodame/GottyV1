@@ -13,6 +13,6 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/router/router.js", "src/router/router.js", "src/router/routeNames.js", "src/router/routeNames.js"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/router/router.ts", "src/router/router.ts", "src/router/routeNames.ts", "src/router/routeNames.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
