@@ -286,11 +286,11 @@ watchEffect((onInvalidate) => {
 
         const search = setTimeout(async () => {
             let data
-            const searchResponse = await fetch(`https://api.rawg.io/api/games?key=${API_KEY}&ordering=-rating&search=${searchValue.value}&page_size=10`)
+            const searchResponse = await fetch(`https://api.rawg.io/api/games?key=${API_KEY}&search=${searchValue.value}&page_size=10`)
             data = await searchResponse.json()
             searchResult.value = data.results
             console.log(searchResult.value)
-        }, 1000)
+        }, 600)
 
         onInvalidate(() => {
             clearInterval(search)
@@ -312,7 +312,7 @@ watchEffect((onInvalidate) => {
 })
 
 const pushToGamePage = (id: number) => {
-    route.push({ name: routeNames.GamePage, params: { gameId: id}})
+    route.replace({ name: routeNames.GamePage, params: { gameId: id}})
     searchValue.value = ""
 }
 
