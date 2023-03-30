@@ -1,5 +1,6 @@
 <style scoped lang="scss">
 .navigation {
+    position: relative;
     margin-bottom: 30px;
     padding: 20px 0;
     display: flex;
@@ -30,14 +31,14 @@
         border-radius: 9999px;
         flex: 1 1 100%;
         background-color: var(--white);
+    }
 
-        img {
-            z-index: 1;
-            position: absolute;
-            left: 15px;
-            width: 20px;
-            height: 20px;
-        }
+    &__search-icon {
+        z-index: 1;
+        position: absolute;
+        left: 15px;
+        width: 20px;
+        height: 20px;
     }
 
     &__search {
@@ -88,12 +89,81 @@
             path {
                 transition: 0.3s ease;
             }
+
             &:hover {
                 path {
                     fill: var(--lRed);
                 }
             }
         }
+    }
+}
+
+.search-result {
+    position: absolute;
+    top: calc(100% + 10px);
+    width: 100%;
+    z-index: 9999;
+
+    &__body {
+        overflow: auto;
+        max-height: 700px;
+        background-color: var(--grey);
+        border-radius: 20px;
+        padding: 20px;
+    }
+
+    &__games {
+        width: 100%;
+
+        h1 {
+            font-size: 18px;
+        }
+    }
+
+    &__games-list {
+        list-style-type: none;
+
+        li {
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            padding: 10px;
+            margin: 5px 0;
+
+            &:hover {
+                background-color: var(--brown);
+            }
+        }
+    }
+
+    &__game-poster {
+        width: 60px;
+        aspect-ratio: 4 / 5;
+
+        img {
+            border-radius: 9px;
+            object-fit: cover;
+            max-width: 100%;
+            height: 100%;
+        }
+    }
+
+    &__game-text {
+        margin-left: 13px;
+    }
+
+    &__game-platfroms {
+        margin-top: 10px;
+        display: flex;
+
+        div {
+            margin-right: 10px;
+        }
+    }
+
+    &__game-name {
+        font-size: 18px;
     }
 }
 </style>
@@ -105,8 +175,42 @@
             <p>Gotty</p>
         </div>
         <div class="navigation__search-bar">
-            <img src="../assets/ico/navigation/searchIcon.svg" alt="">
-            <input type="text" placeholder="Search" class="navigation__search">
+            <img class="navigation__search-icon" src="../assets/ico/navigation/searchIcon.svg" alt="">
+            <input v-model="searchValue" type="text" placeholder="Search" class="navigation__search">
+            <div class="navigation__search-result search-result" v-if="searchValue.length > 0">
+                <div class="search-result__body">
+                    <div class="search-result__games">
+                        <h1>Games 424</h1>
+                        <ul class="search-result__games-list">
+                            <li v-for="(game, idx) in searchResult" :key="idx" @click="pushToGamePage(game.id)">
+                                <div class="search-result__game-poster">
+                                    <img :src="game.background_image" alt="">
+                                </div>
+                                <div class="search-result__game-text">
+                                    <div class="search-result__game-name">{{ game.name }}</div>
+                                    <div class="search-result__game-platfroms">
+                                        <div v-if="getGamePlatform(game, 1)">
+                                            <WindowsIcon />
+                                        </div>
+                                        <div v-if="getGamePlatform(game, 2)">
+                                            <PlaystationIcon />
+                                        </div>
+                                        <div v-if="getGamePlatform(game, 3)">
+                                            <XboxIcon />
+                                        </div>
+                                        <div v-if="getGamePlatform(game, 7)">
+                                            <SwitchIcon />
+                                        </div>
+                                        <div v-if="getGamePlatform(game, 6)">
+                                            <LinixIcon />
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="navigation__user">
             <div class="navigation__user-profile">
@@ -131,4 +235,88 @@
 </template>
 
 <script setup lang="ts">
+import LinixIcon from '../assets/ico/gameCard/LinixIcon.vue';
+import PlaystationIcon from '../assets/ico/gameCard/PlaystationIcon.vue'
+import XboxIcon from '../assets/ico/gameCard/XboxIcon.vue'
+import WindowsIcon from '../assets/ico/gameCard/WindowsIcon.vue'
+import SwitchIcon from '../assets/ico/gameCard/SwitchIcon.vue'
+
+import { useRouter } from "vue-router";
+import { ref, watchEffect } from 'vue';
+import { routeNames } from '../router/routeNames';
+
+type gameList = Array<{
+    background_image: string,
+    name: string,
+    id: number,
+    parent_platforms: Array<{
+        platform: {
+            id: number
+        }
+    }>,
+}>
+
+type game = {
+    parent_platforms: Array<{
+        platform: {
+            id: number
+        }
+    }>,
+}
+
+const route = useRouter()
+const searchValue = ref('')
+const API_KEY = "e0bd00b887d44e569f95cce1824ffd92"
+const searchResult = ref<gameList>([
+    {
+        background_image: "",
+        name: "",
+        id: 0,
+        parent_platforms: [{
+            platform: {
+                id: 0
+            }
+        },],
+    }
+])
+
+watchEffect((onInvalidate) => {
+    if (searchValue.value.length > 0) {
+        console.log("searching....")
+
+        const search = setTimeout(async () => {
+            let data
+            const searchResponse = await fetch(`https://api.rawg.io/api/games?key=${API_KEY}&ordering=-rating&search=${searchValue.value}&page_size=10`)
+            data = await searchResponse.json()
+            searchResult.value = data.results
+            console.log(searchResult.value)
+        }, 1000)
+
+        onInvalidate(() => {
+            clearInterval(search)
+        })
+    } else {
+        searchResult.value = [
+            {
+                background_image: "",
+                name: "",
+                id: 0,
+                parent_platforms: [{
+                    platform: {
+                        id: 0
+                    }
+                },],
+            }
+        ]
+    }
+})
+
+const pushToGamePage = (id: number) => {
+    route.push({ name: routeNames.GamePage, params: { gameId: id}})
+    searchValue.value = ""
+}
+
+const getGamePlatform = (game: game, id: number) => {
+    return game.parent_platforms.find(thePlatform => thePlatform.platform.id === id)
+}
 </script>

@@ -31,7 +31,7 @@
         <div class="game-card__name">
             <p>{{ gameCard.name }}</p>
         </div>
-        <div class="game-card__more-info" style="padding: 0 15px;">
+        <!-- <div class="game-card__more-info">
             <div class="game-card__release-date">
                 <p>Release date</p>
                 <span>{{ gameCard.released }}</span>
@@ -42,9 +42,7 @@
                     <li v-for="(genre, idx) in gameCard.genres" :key="idx">{{ genre.name }}</li>
                 </ul>
             </div>
-
-        </div>
-
+        </div> -->
     </div>
 </template>
 
@@ -54,6 +52,7 @@ import PlaystationIcon from '../assets/ico/gameCard/PlaystationIcon.vue'
 import XboxIcon from '../assets/ico/gameCard/XboxIcon.vue'
 import WindowsIcon from '../assets/ico/gameCard/WindowsIcon.vue'
 import SwitchIcon from '../assets/ico/gameCard/SwitchIcon.vue'
+
 type Props = {
     gameCard: {
         background_image: string,

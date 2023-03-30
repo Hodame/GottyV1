@@ -1,32 +1,62 @@
 <template>
     <div class="game-page">
+        <div class="game-page__background" :style='{
+            background: "url(" + gameInfo.background_image + ")" + "no-repeat center / cover",
+        }'></div>
         <div class="game-page__game-info">
             <div class="game-page__head">
-                <div class="game-page__date-release">{{ gameInfo.released }}</div>
+                <div class="game-page__date-release">{{ dateRelease(gameInfo.released) }}</div>
                 <div class="game-page__platforms">
-                    <div v-if="getGamePlatform(1)" class="game-card__windows">
+                    <div v-if="getGamePlatform(1)">
                         <WindowsIcon />
                     </div>
-                    <div v-if="getGamePlatform(gameInfo, 2)" class="game-card__playstation">
+                    <div v-if="getGamePlatform(2)">
                         <PlaystationIcon />
                     </div>
-                    <div v-if="getGamePlatform(gameInfo, 3)" class="game-card__xbox">
+                    <div v-if="getGamePlatform(3)">
                         <XboxIcon />
                     </div>
-                    <div v-if="getGamePlatform(gameInfo, 7)" class="game-card__switch">
+                    <div v-if="getGamePlatform(7)">
                         <SwitchIcon />
                     </div>
-                    <div v-if="getGamePlatform(gameInfo, 6)" class="game-card__linux">
+                    <div v-if="getGamePlatform(6)">
                         <LinixIcon />
                     </div>
                 </div>
             </div>
-
+            <div class="game-page__title">{{ gameInfo.name }}</div>
+            <div class="game-page__buttons">
+                <div class="game-page__button">
+                    Add to My games
+                </div>
+                <div class="game-page__button">
+                    Add to Wishlist
+                </div>
+                <div class="game-page__button">
+                    Save to collection
+                </div>
+            </div>
+            <div class="game-page__about">
+                <h1>About</h1>
+                <div v-if="gameInfo.description_raw.length > 562" class="game-page__description">
+                    <div v-if="!readMoreValue">
+                        {{ readMore(gameInfo.description_raw) }}
+                    </div>
+                    <div v-else v-html="gameInfo.description">
+                    </div>
+                    <span @click="readMoreValue = !readMoreValue">Read more</span>
+                </div>
+                <div v-else class="game-page__description-raw">
+                    <div v-html="gameInfo.description_raw">
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="game-page__screens">
-
+            <div v-for="(screen, idx) in gameScreens.results" :key="idx" class="game-page__screen">
+                <img :src='screen.image' alt="" width="174" height="98">
+            </div>
         </div>
-
     </div>
 </template>
 
@@ -37,49 +67,84 @@ import XboxIcon from '../assets/ico/gameCard/XboxIcon.vue'
 import WindowsIcon from '../assets/ico/gameCard/WindowsIcon.vue'
 import SwitchIcon from '../assets/ico/gameCard/SwitchIcon.vue'
 
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 
 type GameInfo = {
     background_image: string,
-    parent_platforms?: Array<{
-        id: number
+    parent_platforms: Array<{
+        platform: {
+            id: number
+        }
     }>,
     metacritic: number,
     name: string,
+    description: string,
+    description_raw: string,
     released: string,
     genres?: Array<{
         name: string
     }>,
 }
 
-const getGamePlatform = (id: number) => {
-    return gameInfo.parent_platforms.find((thePlatform) => thePlatform.platform.id === id)
+type gameScreen = {
+    results: Array<{
+        image: string,
+    }>
 }
 
 const route = useRoute()
+const gameScreens = ref<gameScreen>({
+    results: [{
+        image: "fsd",
+    }]
+})
 const gameInfo = ref<GameInfo>({
     background_image: "",
-    parent_platforms: {
-        id: 0,
-    },
+    parent_platforms: [{
+        platform: {
+            id: 0
+        }
+    },],
+    description: "",
+    description_raw: "",
     metacritic: 0,
     name: "",
-    released: "",
-}
-)
+    released: "0000-00-00",
+})
+const readMoreValue = ref(false)
+const readMoreLess = ref("Read more")
 const API_KEY = "e0bd00b887d44e569f95cce1824ffd92"
 
 onMounted(async () => {
     try {
         const response = await fetch(`https://api.rawg.io/api/games/${route.params.gameId}?key=${API_KEY}`)
         gameInfo.value = await response.json()
+        const responseScreen = await fetch(`https://api.rawg.io/api/games/${route.params.gameId}/screenshots?key=${API_KEY}`)
+        gameScreens.value = await responseScreen.json()
     }
     finally {
         console.log("date ", gameInfo.value)
     }
 })
 
+const getGamePlatform = (id: number) => {
+    return gameInfo.value.parent_platforms.find(thePlatform => thePlatform.platform.id === id)
+}
+
+const dateRelease = (released: string) => {
+    const date = released
+    const arrDate = date.split("-")
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", 'Sep', "Oct", "Nov", "Dec"]
+    const gameMonthDate = months[parseInt(arrDate[1].replace('0', "")) - 1]
+    const gameDayDate = parseInt(arrDate[2].replace("0", ""))
+    const gameDateRelease = gameMonthDate + " " + gameDayDate + ", " + arrDate[0]
+    return gameDateRelease
+}
+
+const readMore = (text: string) => {
+    return text.substring(0, 562).trimEnd() + "..."
+}
 </script>
 
 <style scoped lang="scss">

@@ -20,7 +20,7 @@ const router = createRouter({
                     component: () => import("../pages/Home.vue"),
                 },
                 {
-                    path:"/game/:gameId",
+                    path:"/games/:gameId",
                     name: routeNames.GamePage,
                     component: () => import("../pages/GamePage.vue"),
                 }

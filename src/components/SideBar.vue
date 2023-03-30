@@ -1,7 +1,7 @@
 <template>
     <div class="sidebar">
-        <RouterLink style="color: var(--white);"  :to="{ name: routeNames.Home}">
-            <div class="sidebar__home">Home</div>
+        <RouterLink :to="{ name: routeNames.Home }" custom v-slot="{ navigate }">
+            <div @click="navigate" class="sidebar__home">Home</div>
         </RouterLink>
         <div class="sidebar__profile">
             <div class="sidebar__user">

@@ -6,7 +6,6 @@
         list-style: none;
         font-size: 20px;
         padding: 10px 0;
-        margin-left: 15px;
         cursor: pointer;
         transition: 0.3s ease;
         p {
@@ -22,6 +21,7 @@
         margin-bottom: 25px;
         font-size: 30px;
         font-weight: 700;
+        color: var(--white);
         &:hover {
             color: var(--lRed);
         }

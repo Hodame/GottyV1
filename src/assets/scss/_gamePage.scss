@@ -1,0 +1,141 @@
+.game-page {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    &__background {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        height: 500px;
+        z-index: 0;
+        opacity: 0.7;
+        &::after {
+            content: "";
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+            background: radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
+        }
+        &::before {
+            content: "";
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+            background: linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 48%, rgba(0,0,0,1) 100%);
+        }
+    }
+    &__game-info {
+        position: relative;
+        z-index: 10;
+        padding: 30px 0 0 0;
+    }
+
+    &__head {
+        display: flex;
+        align-items: center;
+    }
+
+    &__date-release {
+        background-color: var(--dRed);
+        padding: 5px;
+        border-radius: 5px;
+        font-size: 18px;
+        font-weight: 300;
+        margin-right: 20px;
+        color: var(--white);
+    }
+
+    &__platforms {
+        display: flex;
+        gap: 10px;
+    }
+
+    &__title {
+        margin-top: 30px;
+        font-size: 60px;
+        font-weight: 700;
+    }
+
+    &__buttons {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    &__button {
+        cursor: pointer;
+        background-color: var(--dRed);
+        padding: 10px;
+        margin-right: 10px;
+        border-radius: 10px;
+        font-weight: 500;
+    }
+
+    &__about {
+        margin-top: 40px;
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+    }
+
+    &__description, &__description-raw {
+        line-height: 130%;
+        font-weight: 300;
+        p {
+            margin-bottom: 20px;
+            &:last-child {
+                margin-bottom: 5px;
+            }
+        }
+    }
+
+    &__description {
+        div {
+            display: inline;
+        }
+        span {
+            cursor: pointer;
+            padding: 3px;
+            background-color: var(--white);
+            color: var(--black);
+            font-size: 12px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+    }
+
+    &__screens {
+        margin-top: 100px;
+        height: 100%;
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 98px;
+        grid-auto-rows: 98px;
+        position: relative;
+        z-index: 10;
+    }
+
+    &__screen {
+        width: 100%;
+        height: 98px;
+        img {
+            border-radius: 5px;
+            max-width: 100%;
+        }
+    }
+}
+

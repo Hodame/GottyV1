@@ -4,7 +4,6 @@
         <h2 class="home__subtitle">Based on player counts and release date</h2>
         <div class="home__game-list">
             <template v-if="!loading">
-
                 <GameCard v-for="(card, idx) in resData" @linkToGame="openGame(card)" :key="idx" :gameCard="card" />
             </template>
             <template v-else>
@@ -62,6 +61,7 @@ onMounted(async () => {
     catch (e) { console.error(e) }
 
     finally {
+        console.log(resData.value)
         loading.value = false
     }
 
@@ -94,7 +94,7 @@ const openGame = (card: GCard) => {
         display: grid;
         column-gap: 30px;
         row-gap: 30px;
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(4, 1fr);
     }
 }
 
