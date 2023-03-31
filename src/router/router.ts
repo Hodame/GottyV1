@@ -7,12 +7,16 @@ const router = createRouter({
         {
             path: "/auth",
             name: routeNames.Auth,
-            component: {template: "<h1>test</h1>"}
+            component: {template: "<h1>test</h1>"},
+            children: [
+                
+            ]
         },
         {
             path: "/layout",
             name: routeNames.Layout,
             component: () => import("../pages/Main.vue"),
+            redirect: routeNames.Home,
             children: [
                 {
                     path:"/",
@@ -23,6 +27,19 @@ const router = createRouter({
                     path:"/games/:gameId",
                     name: routeNames.GamePage,
                     component: () => import("../pages/GamePage.vue"),
+                },
+                {
+                    path: "/profile",
+                    name: routeNames.Profile,
+                    component: () => import("../pages/Profile.vue"),
+                    redirect: "/profile/games",
+                    children: [
+                        {
+                            path: "/profile/games",
+                            name: routeNames.UserGames,
+                            component: () => import("../components/UserGames.vue")
+                        }
+                    ]
                 }
             ]
         }

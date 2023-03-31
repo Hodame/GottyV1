@@ -94,7 +94,7 @@ const openGame = (card: GCard) => {
         display: grid;
         column-gap: 30px;
         row-gap: 30px;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(5, 1fr);
     }
 }
 

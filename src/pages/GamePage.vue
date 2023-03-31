@@ -44,7 +44,7 @@
                     </div>
                     <div v-else v-html="gameInfo.description">
                     </div>
-                    <span @click="readMoreValue = !readMoreValue">Read more</span>
+                    <span @click="readMoreValue = !readMoreValue">{{ readMoreValue ? "Show less" : "Read more" }}</span>
                 </div>
                 <div v-else class="game-page__description-raw">
                     <div v-html="gameInfo.description_raw">

@@ -9,9 +9,6 @@
     transform: scale(1);
     &:hover {
         transform: scale(1.02);
-        // .game-card__more-info {
-        //     opacity: 1;
-        // }
     }
     &__poster {
         padding-bottom: 56.56%;
@@ -41,6 +38,7 @@
     }
     &__name {
         padding: 10px 15px;
+        color: var(--white);
         p {
             font-size: 24px;
             line-height: 110%;

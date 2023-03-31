@@ -14,13 +14,13 @@
 
         img {
             margin-right: 10px;
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
         }
 
         p {
             font-weight: 900;
-            font-size: 28px;
+            font-size: 22px;
         }
     }
 
@@ -29,7 +29,7 @@
         display: flex;
         align-items: center;
         border-radius: 9999px;
-        flex: 1 1 100%;
+        flex: 0 1 30%;
         background-color: var(--white);
     }
 
@@ -46,8 +46,8 @@
         z-index: 20;
         width: 100%;
         font-weight: 500;
-        font-size: 18px;
-        padding: 15px 30px 15px 45px;
+        font-size: 16px;
+        padding: 10px 20px 10px 40px;
         background-color: transparent;
     }
 
@@ -61,8 +61,8 @@
 
         img {
             cursor: pointer;
-            width: 50px;
-            height: 50px;
+            width: 35px;
+            height: 35px;
         }
 
         p {
@@ -70,7 +70,6 @@
             margin-left: 10px;
             white-space: nowrap;
             font-weight: 500;
-            font-size: 18px;
             transition: 0.3s ease;
 
             &:hover {
@@ -104,20 +103,36 @@
     top: calc(100% + 10px);
     width: 100%;
     z-index: 9999;
+    color: var(--white);
+    padding: 0 5px 0 0;
+    background-color: var(--grey);
+    border-radius: 20px;
 
     &__body {
         overflow: auto;
         max-height: 700px;
-        background-color: var(--grey);
-        border-radius: 20px;
-        padding: 20px;
+        padding: 15px;
+
+        &::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        &::-webkit-scrollbar-track {
+            margin: 20px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            cursor: pointer;
+            background-color: var(--brown);
+            border-radius: 9999px;
+        }
     }
 
     &__games {
         width: 100%;
 
         h1 {
-            font-size: 18px;
+            margin-bottom: 10px;
         }
     }
 
@@ -128,8 +143,8 @@
             border-radius: 20px;
             cursor: pointer;
             display: flex;
-            padding: 10px;
-            margin: 5px 0;
+            padding: 8px;
+            margin-left: -10px;
 
             &:hover {
                 background-color: var(--brown);
@@ -138,7 +153,7 @@
     }
 
     &__game-poster {
-        width: 60px;
+        width: 50px;
         aspect-ratio: 4 / 5;
 
         img {
@@ -165,6 +180,27 @@
     &__game-name {
         font-size: 18px;
     }
+
+    &__placeholder {
+        width: 100%;
+        background-color: var(--grey);
+        height: 200px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__loader {
+        margin: 0 0 2em;
+        height: 100px;
+        width: 100%;
+        text-align: center;
+        padding: 1em;
+        margin: 0 auto 1em;
+        display: inline-block;
+        vertical-align: top;
+    }
 }
 </style>
 
@@ -174,13 +210,13 @@
             <img src="../assets/ico/navigation/mainLogo.svg" alt="">
             <p>Gotty</p>
         </div>
-        <div class="navigation__search-bar">
+        <div class="navigation__search-bar" ref="search_box">
             <img class="navigation__search-icon" src="../assets/ico/navigation/searchIcon.svg" alt="">
             <input v-model="searchValue" type="text" placeholder="Search" class="navigation__search">
             <div class="navigation__search-result search-result" v-if="searchValue.length > 0">
-                <div class="search-result__body">
+                <div v-if="!loading" class="search-result__body">
                     <div class="search-result__games">
-                        <h1>Games 424</h1>
+                        <h1>Games {{ searchResult.length }}</h1>
                         <ul class="search-result__games-list">
                             <li v-for="(game, idx) in searchResult" :key="idx" @click="pushToGamePage(game.id)">
                                 <div class="search-result__game-poster">
@@ -210,6 +246,33 @@
                         </ul>
                     </div>
                 </div>
+                <div v-else class="search-result__placeholder">
+                    <div class="search-result__loader loader--style5" title="4">
+                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="50px" height="60px"
+                            viewBox="0 0 24 30" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+                            <rect x="0" y="13" width="4" height="5" fill="#333">
+                                <animate attributeName="height" attributeType="XML" values="5;21;5" begin="0s" dur="0.6s"
+                                    repeatCount="indefinite" />
+                                <animate attributeName="y" attributeType="XML" values="13; 5; 13" begin="0s" dur="0.6s"
+                                    repeatCount="indefinite" />
+                            </rect>
+                            <rect x="10" y="13" width="4" height="5" fill="#333">
+                                <animate attributeName="height" attributeType="XML" values="5;21;5" begin="0.15s" dur="0.6s"
+                                    repeatCount="indefinite" />
+                                <animate attributeName="y" attributeType="XML" values="13; 5; 13" begin="0.15s" dur="0.6s"
+                                    repeatCount="indefinite" />
+                            </rect>
+                            <rect x="20" y="13" width="4" height="5" fill="#333">
+                                <animate attributeName="height" attributeType="XML" values="5;21;5" begin="0.3s" dur="0.6s"
+                                    repeatCount="indefinite" />
+                                <animate attributeName="y" attributeType="XML" values="13; 5; 13" begin="0.3s" dur="0.6s"
+                                    repeatCount="indefinite" />
+                            </rect>
+                        </svg>
+                    </div>
+                </div>
+
             </div>
         </div>
         <div class="navigation__user">
@@ -241,6 +304,7 @@ import XboxIcon from '../assets/ico/gameCard/XboxIcon.vue'
 import WindowsIcon from '../assets/ico/gameCard/WindowsIcon.vue'
 import SwitchIcon from '../assets/ico/gameCard/SwitchIcon.vue'
 
+import { onClickOutside } from '@vueuse/core'
 import { useRouter } from "vue-router";
 import { ref, watchEffect } from 'vue';
 import { routeNames } from '../router/routeNames';
@@ -267,6 +331,8 @@ type game = {
 const route = useRouter()
 const searchValue = ref('')
 const API_KEY = "e0bd00b887d44e569f95cce1824ffd92"
+const search_box = ref<HTMLDivElement>()
+const loading = ref(true)
 const searchResult = ref<gameList>([
     {
         background_image: "",
@@ -282,20 +348,25 @@ const searchResult = ref<gameList>([
 
 watchEffect((onInvalidate) => {
     if (searchValue.value.length > 0) {
-        console.log("searching....")
-
+        loading.value = true
         const search = setTimeout(async () => {
-            let data
-            const searchResponse = await fetch(`https://api.rawg.io/api/games?key=${API_KEY}&search=${searchValue.value}&page_size=10`)
-            data = await searchResponse.json()
-            searchResult.value = data.results
-            console.log(searchResult.value)
+            try {
+                let data
+                const searchResponse = await fetch(`https://api.rawg.io/api/games?key=${API_KEY}&search=${searchValue.value}&page_size=10`)
+                data = await searchResponse.json()
+                searchResult.value = data.results
+                console.log(searchResult.value)
+            }
+            finally {
+                loading.value = false
+            }
         }, 600)
 
         onInvalidate(() => {
             clearInterval(search)
         })
-    } else {
+    }
+    else {
         searchResult.value = [
             {
                 background_image: "",
@@ -312,11 +383,13 @@ watchEffect((onInvalidate) => {
 })
 
 const pushToGamePage = (id: number) => {
-    route.replace({ name: routeNames.GamePage, params: { gameId: id}})
+    route.replace({ name: routeNames.GamePage, params: { gameId: id } })
     searchValue.value = ""
 }
 
 const getGamePlatform = (game: game, id: number) => {
     return game.parent_platforms.find(thePlatform => thePlatform.platform.id === id)
 }
+
+onClickOutside(search_box, () => searchValue.value ? searchValue.value = "" : undefined)
 </script>

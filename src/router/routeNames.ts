@@ -4,4 +4,8 @@ export const routeNames = {
     Layout: "Layout",
     Home: "Home",
     GamePage: "GamePage",
+    Profile: "Profile",
+    UserGames: "UserGames",
+    Login: "Login", 
+    Register: "Register",
 }
