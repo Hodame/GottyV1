@@ -1,9 +1,9 @@
 <template>
 	<div class="user-page">
 		<div class="user-page__info">
-			<div class="user-page__id">@hodame</div>
+			<div class="user-page__id">@{{ currentUser.displayName }}</div>
 			<div class="user-page__avatar">
-				<img src="https://cdn-icons-png.flaticon.com/512/727/727399.png" alt="">
+				<img :src="currentUser.photoURL" alt="">
 			</div>
 			<div class="user-page__settings">
 				<span>Settings</span>
@@ -19,7 +19,33 @@
 </template>
 
 <script setup lang="ts">
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../firebase/config';
+import { ref } from 'vue';
 
+type CurrentUser = {
+    displayName: string | null, 
+    photoURL: string | undefined
+}
+
+const logged = ref(false)
+const currentUser = ref<CurrentUser>({
+    displayName: "",
+    photoURL: "",
+})
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        currentUser.value.displayName = user.displayName
+        if (user.photoURL != null) {
+            currentUser.value.photoURL = user.photoURL
+        }
+        console.log(user)
+        logged.value = true
+    } else {
+        console.log("error");
+        logged.value = false
+    }
+})
 </script>
 
 <style scoped lang="scss">

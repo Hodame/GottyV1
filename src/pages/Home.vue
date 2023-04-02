@@ -61,7 +61,6 @@ onMounted(async () => {
     catch (e) { console.error(e) }
 
     finally {
-        console.log(resData.value)
         loading.value = false
     }
 

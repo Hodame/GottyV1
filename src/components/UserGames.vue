@@ -1,68 +1,80 @@
 <template>
 	<div class="user-games">
-		<div class="user-games__want">
+		<div v-if="gamesWant.length > 0" class="user-games__want">
 			<div class="user-games__head">
 				<h1>Want</h1>
 				<div>
 					<img src="../assets/ico/profile/gamepad.svg" alt="">
-					<span>34</span>
+					<span>{{ gamesWant.length }}</span>
 				</div>
 				<button>See all</button>
 			</div>
 			<ul class="user-games__list">
-				<li class="user-games__game">
-					<div class="user-games__background">
-						<img src="https://media.rawg.io/media/games/044/044b2ee023930ca138deda151f40c18c.jpg" alt="">
-					</div>
-					<div class="user-games__body">
-						<div class="user-games__title">Hogwarts legacy</div>
-						<span class="user-games__metacritic">85</span>
-						<div class="user-games__date">Feb 10, 2023</div>
-					</div>
+				<li v-for="(game, idx) in gamesWant" :key="idx" class="user-games__game">
+					<RouterLink :to="{ name: routeNames.GamePage, params: { gameId:  game.gameId} }">
+						<div class="user-games__game-body">
+							<div class="user-games__background">
+								<img :src="game.gamePoster" alt="">
+							</div>
+							<div class="user-games__body">
+								<div class="user-games__title">{{ game.gameName }}</div>
+								<span class="user-games__metacritic">{{ game.gameMetacritic }}</span>
+								<div class="user-games__date">{{ dateRelease(game.gameDateRelease) }}</div>
+							</div>
+						</div>
+					</RouterLink>
 				</li>
 			</ul>
 		</div>
-		<div class="user-games__playing">
+		<div v-if="gamesPlaying.length > 0" class="user-games__playing">
 			<div class="user-games__head">
 				<h1>Playing</h1>
 				<div>
 					<img src="../assets/ico/profile/gamepad.svg" alt="">
-					<span>34</span>
+					<span>{{ gamesPlaying.length }}</span>
 				</div>
 				<button>See all</button>
 			</div>
 			<ul class="user-games__list">
-				<li class="user-games__game">
-					<div class="user-games__background">
-						<img src="https://media.rawg.io/media/games/044/044b2ee023930ca138deda151f40c18c.jpg" alt="">
-					</div>
-					<div class="user-games__body">
-						<div class="user-games__title">Hogwarts legacy</div>
-						<span class="user-games__metacritic">85</span>
-						<div class="user-games__date">Feb 10, 2023</div>
-					</div>
+				<li v-for="(game, idx) in gamesPlaying" :key="idx" class="user-games__game">
+					<RouterLink :to="{ name: routeNames.GamePage, params: { gameId:  game.gameId} }">
+						<div class="user-games__game-body">
+							<div class="user-games__background">
+								<img :src="game.gamePoster" alt="">
+							</div>
+							<div class="user-games__body">
+								<div class="user-games__title">{{ game.gameName }}</div>
+								<span class="user-games__metacritic">{{ game.gameMetacritic }}</span>
+								<div class="user-games__date">{{ dateRelease(game.gameDateRelease) }}</div>
+							</div>
+						</div>
+					</RouterLink>
 				</li>
 			</ul>
 		</div>
-		<div class="user-games__beaten">
+		<div v-if="gamesBeaten.length > 0" class="user-games__beaten">
 			<div class="user-games__head">
 				<h1>Beaten</h1>
 				<div>
 					<img src="../assets/ico/profile/gamepad.svg" alt="">
-					<span>34</span>
+					<span>{{ gamesBeaten.length }}</span>
 				</div>
 				<button>See all</button>
 			</div>
 			<ul class="user-games__list">
-				<li class="user-games__game">
-					<div class="user-games__background">
-						<img src="https://media.rawg.io/media/games/044/044b2ee023930ca138deda151f40c18c.jpg" alt="">
-					</div>
-					<div class="user-games__body">
-						<div class="user-games__title">Hogwarts legacy</div>
-						<span class="user-games__metacritic">85</span>
-						<div class="user-games__date">Feb 10, 2023</div>
-					</div>
+				<li v-for="(game, idx) in gamesBeaten" :key="idx" class="user-games__game">
+					<RouterLink :to="{ name: routeNames.GamePage, params: { gameId:  game.gameId} }">
+						<div class="user-games__game-body">
+							<div class="user-games__background">
+								<img :src="game.gamePoster" alt="">
+							</div>
+							<div class="user-games__body">
+								<div class="user-games__title">{{ game.gameName }}</div>
+								<span class="user-games__metacritic">{{ game.gameMetacritic }}</span>
+								<div class="user-games__date">{{ dateRelease(game.gameDateRelease) }}</div>
+							</div>
+						</div>
+					</RouterLink>
 				</li>
 			</ul>
 		</div>
@@ -70,9 +82,86 @@
 	</div>
 </template>
 
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
+import { collection, getDocs } from 'firebase/firestore';
+import { auth, db } from '../firebase/config';
+import { routeNames } from '../router/routeNames';
+
+type GameInfo = Array<{
+	gameDateRelease: string,
+	gameId: number,
+	gameMetacritic: number | undefined,
+	gameName: string,
+	gamePoster: string | undefined,
+}>
+
+const gamesWant = ref<GameInfo>([
+])
+const gamesPlaying = ref<GameInfo>([
+])
+const gamesBeaten = ref<GameInfo>([
+])
+const currentUserId = auth.currentUser?.uid
+
+onMounted(async () => {
+	try {
+		if (currentUserId != null) {
+			const want = await getDocs(collection(db, "users", currentUserId, "want"))
+			want.forEach((doc) => {
+				const game = {
+					gameDateRelease: doc.data().gameDateRelease,
+					gameId: doc.data().gameId,
+					gameMetacritic: doc.data().gameMetacritic,
+					gameName: doc.data().gameName,
+					gamePoster: doc.data().gamePoster,
+				}
+				gamesWant.value.unshift(game)
+			})
+			const playing = await getDocs(collection(db, "users", currentUserId, "playing"))
+			playing.forEach((doc) => {
+				const game = {
+					gameDateRelease: doc.data().gameDateRelease,
+					gameId: doc.data().gameId,
+					gameMetacritic: doc.data().gameMetacritic,
+					gameName: doc.data().gameName,
+					gamePoster: doc.data().gamePoster,
+				}
+				gamesPlaying.value.unshift(game)
+			})
+			const beaten = await getDocs(collection(db, "users", currentUserId, "beaten"))
+			beaten.forEach((doc) => {
+				const game = {
+					gameDateRelease: doc.data().gameDateRelease,
+					gameId: doc.data().gameId,
+					gameMetacritic: doc.data().gameMetacritic,
+					gameName: doc.data().gameName,
+					gamePoster: doc.data().gamePoster,
+				}
+				gamesBeaten.value.unshift(game)
+			})
+		}
+	}
+	finally {
+	}
+})
+
+const dateRelease = (released: string) => {
+    const date = released
+    const arrDate = date.split("-")
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", 'Sep', "Oct", "Nov", "Dec"]
+    const gameMonthDate = months[parseInt(arrDate[1].replace('0', "")) - 1]
+    const gameDayDate = parseInt(arrDate[2].replace("0", ""))
+    const gameDateRelease = gameMonthDate + " " + gameDayDate + ", " + arrDate[0]
+    return gameDateRelease
+}
+
+</script>
+
 <style scoped lang="scss">
 .user-games {
 	margin-top: 40px;
+
 	li {
 		cursor: pointer;
 		list-style-type: none;
@@ -115,6 +204,7 @@
 			border-radius: 10px;
 			color: var(--white);
 			transition: 0.2s ease;
+
 			&:hover {
 				color: var(--lRed);
 			}
@@ -142,13 +232,21 @@
 		}
 	}
 
+	&__game-body {
+		height: 100%;
+		color: var(--white);
+	}
+
 	&__background {
+		height: 100%;
 		position: absolute;
 		z-index: 1;
 		transition: 0.4s ease;
 
 		img {
 			width: 100%;
+			height: 100%;
+			object-fit: cover;
 		}
 	}
 
@@ -164,6 +262,7 @@
 		z-index: 100;
 		padding: 0 0 30px 20px;
 		transform: translateY(50%);
+		background: linear-gradient(0deg, rgba(0, 0, 0, 1) 0%, rgba(91, 91, 91, 0) 100%);
 	}
 
 	&__title {

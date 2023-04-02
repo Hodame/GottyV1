@@ -1,15 +1,29 @@
-import { createRouter, createWebHistory} from "vue-router"
+import { createRouter, createWebHistory } from "vue-router"
 import { routeNames } from "./routeNames"
-
+import { auth } from "../firebase/config"
+import { onAuthStateChanged } from "firebase/auth"
 const router = createRouter({
     history: createWebHistory(),
     routes: [
         {
             path: "/auth",
             name: routeNames.Auth,
-            component: {template: "<h1>test</h1>"},
+            component: () => import("../pages/Auth.vue"),
+            meta: {
+                requiresLoggedOut: true
+            },
+            redirect: routeNames.Login,
             children: [
-                
+                {
+                    path: "/login",
+                    name: routeNames.Login,
+                    component: () => import("../pages/login.vue")
+                },
+                {
+                    path: "/register",
+                    name: routeNames.Register,
+                    component: () => import("../pages/Register.vue")
+                }
             ]
         },
         {
@@ -19,12 +33,12 @@ const router = createRouter({
             redirect: routeNames.Home,
             children: [
                 {
-                    path:"/",
+                    path: "/",
                     name: routeNames.Home,
                     component: () => import("../pages/Home.vue"),
                 },
                 {
-                    path:"/games/:gameId",
+                    path: "/games/:gameId",
                     name: routeNames.GamePage,
                     component: () => import("../pages/GamePage.vue"),
                 },
@@ -32,6 +46,9 @@ const router = createRouter({
                     path: "/profile",
                     name: routeNames.Profile,
                     component: () => import("../pages/Profile.vue"),
+                    meta: {
+                        requiresAuth: true
+                    },
                     redirect: "/profile/games",
                     children: [
                         {
@@ -44,6 +61,30 @@ const router = createRouter({
             ]
         }
     ]
+})
+
+function getCurrentUser() {
+    return new Promise((resolve, reject) => {
+        const unsubscribe = onAuthStateChanged(
+            auth,
+            (user) => {
+                unsubscribe()
+                resolve(user)
+            },
+            reject
+        )
+    })
+}
+
+router.beforeEach(async (to) => {
+    const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+    const requiresLoggedOut = to.matched.some((record) => record.meta.requiresLoggedOut)
+    if (requiresAuth && !(await getCurrentUser())) {
+        return '/'
+    }
+    else if (requiresLoggedOut && (await getCurrentUser())) {
+        return '/'
+    }
 })
 
 export default router

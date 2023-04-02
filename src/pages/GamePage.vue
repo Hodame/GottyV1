@@ -26,8 +26,15 @@
             </div>
             <div class="game-page__title">{{ gameInfo.name }}</div>
             <div class="game-page__buttons">
-                <div class="game-page__button">
-                    Add to My games
+                <div class="game-page__button add-mygames">
+                    <p>Add to My games</p>
+                    <span></span>
+                    <ul class="add-mygames__body">
+                        <li @click="addToUserWantCollection">Want</li>
+                        <li @click="addToUserPlayingCollection">Playing</li>
+                        <li @click="addToUserBeatenCollection">Beaten</li>
+                    </ul>
+
                 </div>
                 <div class="game-page__button">
                     Add to Wishlist
@@ -67,8 +74,11 @@ import XboxIcon from '../assets/ico/gameCard/XboxIcon.vue'
 import WindowsIcon from '../assets/ico/gameCard/WindowsIcon.vue'
 import SwitchIcon from '../assets/ico/gameCard/SwitchIcon.vue'
 
-import { onMounted, ref, computed } from 'vue';
+import { doc, addDoc, collection } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import { auth, db } from '../firebase/config';
 
 type GameInfo = {
     background_image: string,
@@ -77,6 +87,7 @@ type GameInfo = {
             id: number
         }
     }>,
+    id: number,
     metacritic: number,
     name: string,
     description: string,
@@ -106,6 +117,7 @@ const gameInfo = ref<GameInfo>({
             id: 0
         }
     },],
+    id: 0,
     description: "",
     description_raw: "",
     metacritic: 0,
@@ -115,7 +127,7 @@ const gameInfo = ref<GameInfo>({
 const readMoreValue = ref(false)
 const readMoreLess = ref("Read more")
 const API_KEY = "e0bd00b887d44e569f95cce1824ffd92"
-
+const currentUserId = auth.currentUser?.uid
 onMounted(async () => {
     try {
         const response = await fetch(`https://api.rawg.io/api/games/${route.params.gameId}?key=${API_KEY}`)
@@ -145,7 +157,56 @@ const dateRelease = (released: string) => {
 const readMore = (text: string) => {
     return text.substring(0, 562).trimEnd() + "..."
 }
-</script>
+
+
+const addToUserWantCollection = async () => {        
+    if (currentUserId != null) {
+        await addDoc(collection(db, "users", currentUserId, "want"), {
+            gameName: gameInfo.value.name,
+            gameId: gameInfo.value.id,
+            gameDateRelease: gameInfo.value.released, 
+            gamePoster: gameInfo.value.background_image,
+            gameMetacritic: gameInfo.value.metacritic,
+        })
+    } 
+    else if (currentUserId === null) {
+        alert("You need to login first")
+    }
+    else if (currentUserId === undefined) {
+        alert("You need to login first")
+    }    
+}
+
+const addToUserPlayingCollection = async () => {        
+    if (currentUserId != null) {
+        await addDoc(collection(db, "users", currentUserId, "playing"), {
+            gameName: gameInfo.value.name,
+            gameId: gameInfo.value.id,
+            gameDateRelease: gameInfo.value.released, 
+            gamePoster: gameInfo.value.background_image,
+            gameMetacritic: gameInfo.value.metacritic,
+        })
+    } 
+    else if (currentUserId === null) {
+        alert("You need to login first")
+    }
+}
+
+const addToUserBeatenCollection = async () => {        
+    if (currentUserId != null) {
+        await addDoc(collection(db, "users", currentUserId, "beaten"), {
+            gameName: gameInfo.value.name,
+            gameId: gameInfo.value.id,
+            gameDateRelease: gameInfo.value.released, 
+            gamePoster: gameInfo.value.background_image,
+            gameMetacritic: gameInfo.value.metacritic,
+        })
+    } 
+    else if (currentUserId === null) {
+        alert("You need to login first")
+    }
+}
+</script> 
 
 <style scoped lang="scss">
 .game-page {

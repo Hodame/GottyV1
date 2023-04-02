@@ -1,208 +1,4 @@
-<style scoped lang="scss">
-.navigation {
-    position: relative;
-    margin-bottom: 30px;
-    padding: 20px 0;
-    display: flex;
-    gap: 30px;
-    justify-content: space-between;
-    align-items: center;
-
-    &__logo {
-        display: flex;
-        align-items: center;
-
-        img {
-            margin-right: 10px;
-            width: 35px;
-            height: 35px;
-        }
-
-        p {
-            font-weight: 900;
-            font-size: 22px;
-        }
-    }
-
-    &__search-bar {
-        position: relative;
-        display: flex;
-        align-items: center;
-        border-radius: 9999px;
-        flex: 0 1 30%;
-        background-color: var(--white);
-    }
-
-    &__search-icon {
-        z-index: 1;
-        position: absolute;
-        left: 15px;
-        width: 20px;
-        height: 20px;
-    }
-
-    &__search {
-        position: relative;
-        z-index: 20;
-        width: 100%;
-        font-weight: 500;
-        font-size: 16px;
-        padding: 10px 20px 10px 40px;
-        background-color: transparent;
-    }
-
-    &__user {
-        display: flex;
-    }
-
-    &__user-profile {
-        display: flex;
-        align-items: center;
-
-        img {
-            cursor: pointer;
-            width: 35px;
-            height: 35px;
-        }
-
-        p {
-            cursor: pointer;
-            margin-left: 10px;
-            white-space: nowrap;
-            font-weight: 500;
-            transition: 0.3s ease;
-
-            &:hover {
-                color: var(--lRed);
-            }
-        }
-    }
-
-    &__settings {
-        margin-left: 15px;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-
-        svg {
-            path {
-                transition: 0.3s ease;
-            }
-
-            &:hover {
-                path {
-                    fill: var(--lRed);
-                }
-            }
-        }
-    }
-}
-
-.search-result {
-    position: absolute;
-    top: calc(100% + 10px);
-    width: 100%;
-    z-index: 9999;
-    color: var(--white);
-    padding: 0 5px 0 0;
-    background-color: var(--grey);
-    border-radius: 20px;
-
-    &__body {
-        overflow: auto;
-        max-height: 700px;
-        padding: 15px;
-
-        &::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        &::-webkit-scrollbar-track {
-            margin: 20px;
-        }
-
-        &::-webkit-scrollbar-thumb {
-            cursor: pointer;
-            background-color: var(--brown);
-            border-radius: 9999px;
-        }
-    }
-
-    &__games {
-        width: 100%;
-
-        h1 {
-            margin-bottom: 10px;
-        }
-    }
-
-    &__games-list {
-        list-style-type: none;
-
-        li {
-            border-radius: 20px;
-            cursor: pointer;
-            display: flex;
-            padding: 8px;
-            margin-left: -10px;
-
-            &:hover {
-                background-color: var(--brown);
-            }
-        }
-    }
-
-    &__game-poster {
-        width: 50px;
-        aspect-ratio: 4 / 5;
-
-        img {
-            border-radius: 9px;
-            object-fit: cover;
-            max-width: 100%;
-            height: 100%;
-        }
-    }
-
-    &__game-text {
-        margin-left: 13px;
-    }
-
-    &__game-platfroms {
-        margin-top: 10px;
-        display: flex;
-
-        div {
-            margin-right: 10px;
-        }
-    }
-
-    &__game-name {
-        font-size: 18px;
-    }
-
-    &__placeholder {
-        width: 100%;
-        background-color: var(--grey);
-        height: 200px;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    &__loader {
-        margin: 0 0 2em;
-        height: 100px;
-        width: 100%;
-        text-align: center;
-        padding: 1em;
-        margin: 0 auto 1em;
-        display: inline-block;
-        vertical-align: top;
-    }
-}
-</style>
+<style scoped lang="scss"></style>
 
 <template>
     <div class="navigation">
@@ -276,9 +72,22 @@
             </div>
         </div>
         <div class="navigation__user">
-            <div class="navigation__user-profile">
-                <img src="https://cdn-icons-png.flaticon.com/512/727/727399.png" alt="">
-                <p>My collection</p>
+            <div v-if="logged" class="navigation__user-profile">
+                <RouterLink :to="{ name: routeNames.Profile}">
+                    <div>
+                        <img :src="currentUser.photoURL" alt="avatar">
+                        <p>My games</p>
+                    </div>
+                </RouterLink>
+            </div>
+            <div v-else class="navigation__auth">
+                <RouterLink :to="{ name: routeNames.Auth }">
+                    <button class="navigation__login">Login</button>
+                </RouterLink>
+                <RouterLink :to="{ name: routeNames.Register }">
+                    <button class="navigation__sign-up">Sign up</button>
+
+                </RouterLink>
             </div>
             <div class="navigation__settings">
                 <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -292,6 +101,10 @@
                         d="M21 12C21 10.8954 20.1046 10 19 10C17.8954 10 17 10.8954 17 12C17 13.1046 17.8954 14 19 14C20.1046 14 21 13.1046 21 12Z"
                         fill="#fff" />
                 </svg>
+                <div v-if="logged" class="navigation__settings-popup">
+                    <button @click="logOut">Log out</button>
+                </div>
+
             </div>
         </div>
     </div>
@@ -304,10 +117,17 @@ import XboxIcon from '../assets/ico/gameCard/XboxIcon.vue'
 import WindowsIcon from '../assets/ico/gameCard/WindowsIcon.vue'
 import SwitchIcon from '../assets/ico/gameCard/SwitchIcon.vue'
 
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { onClickOutside } from '@vueuse/core'
 import { useRouter } from "vue-router";
 import { ref, watchEffect } from 'vue';
 import { routeNames } from '../router/routeNames';
+import { auth } from '../firebase/config';
+import router from '../router/router';
+
+type CurrentUser = {
+    photoURL: string | undefined
+}
 
 type gameList = Array<{
     background_image: string,
@@ -333,6 +153,10 @@ const searchValue = ref('')
 const API_KEY = "e0bd00b887d44e569f95cce1824ffd92"
 const search_box = ref<HTMLDivElement>()
 const loading = ref(true)
+const logged = ref(false)
+const currentUser = ref<CurrentUser>({
+    photoURL: "",
+})
 const searchResult = ref<gameList>([
     {
         background_image: "",
@@ -390,6 +214,26 @@ const pushToGamePage = (id: number) => {
 const getGamePlatform = (game: game, id: number) => {
     return game.parent_platforms.find(thePlatform => thePlatform.platform.id === id)
 }
+
+const logOut = () => {
+    signOut(auth).then(() => {
+        router.replace({ path: "/" })
+    })
+        .catch((error) => {
+            alert(error)
+        })
+}
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        if (user.photoURL != null) {
+            currentUser.value.photoURL = user.photoURL
+        }
+        logged.value = true
+    } else {
+        logged.value = false
+    }
+})
+
 
 onClickOutside(search_box, () => searchValue.value ? searchValue.value = "" : undefined)
 </script>

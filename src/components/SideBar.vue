@@ -3,11 +3,11 @@
         <RouterLink :to="{ name: routeNames.Home }" custom v-slot="{ navigate }">
             <div @click="navigate" class="sidebar__home">Home</div>
         </RouterLink>
-        <div class="sidebar__profile">
-            <RouterLink :to="{ name: routeNames.Profile}">
+        <div v-if="logged" class="sidebar__profile">
+            <RouterLink :to="{ name: routeNames.Profile }">
                 <div class="sidebar__user">
-                    <p>hodame</p>
-                    <img src="https://cdn-icons-png.flaticon.com/512/727/727399.png" alt="userLogo">
+                    <p>{{ currentUser.displayName}}</p>
+                    <img :src="currentUser.photoURL" alt="avatar">
                 </div>
             </RouterLink>
             <ul class="sidebar__profile-list">
@@ -21,7 +21,7 @@
                                 stroke="#ff334d" stroke-width="2" />
                         </g>
                     </svg>
-                    <p>Wishlist</p>
+                    <p>My games</p>
                 </li>
                 <li class="sidebar__profile-collection">
                     <svg width="25" height="25" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -104,4 +104,29 @@
 
 <script setup lang="ts">
 import { routeNames } from '../router/routeNames';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../firebase/config';
+import { ref } from 'vue';
+
+type CurrentUser = {
+    displayName: string | null, 
+    photoURL: string | undefined
+}
+
+const logged = ref(false)
+const currentUser = ref<CurrentUser>({
+    displayName: "",
+    photoURL: "",
+})
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        currentUser.value.displayName = user.displayName
+        if (user.photoURL != null) {
+            currentUser.value.photoURL = user.photoURL
+        }
+        logged.value = true
+    } else {
+        logged.value = false
+    }
+})
 </script>
