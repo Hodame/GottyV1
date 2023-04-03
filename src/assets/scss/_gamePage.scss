@@ -3,6 +3,7 @@
     display: flex;
     justify-content: center;
     gap: 30px;
+
     &__background {
         position: absolute;
         top: 0;
@@ -12,6 +13,7 @@
         height: 500px;
         z-index: 0;
         opacity: 0.7;
+
         &::after {
             content: "";
             width: 100%;
@@ -23,6 +25,7 @@
             z-index: 1;
             background: radial-gradient(circle, rgba(255, 255, 255, 0) 0%, rgb(0, 0, 0) 100%);
         }
+
         &::before {
             content: "";
             width: 100%;
@@ -35,6 +38,7 @@
             background: linear-gradient(0deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 48%, rgba(0, 0, 0, 1) 100%);
         }
     }
+
     &__game-info {
         position: relative;
         z-index: 10;
@@ -74,16 +78,49 @@
     }
 
     &__button {
+        overflow: hidden;
+        position: relative;
         cursor: pointer;
         background-color: var(--dRed);
-        padding: 10px;
+        padding: 15px 10px;
         margin-right: 10px;
         border-radius: 10px;
         font-weight: 500;
+        color: var(--white);
+        transition: 0.3s ease;
+
+        p {
+            position: relative;
+            z-index: 10;
+        }
+        &::first-letter {
+            text-transform: uppercase;
+        }
+        &::after {
+            content: "";
+            width: 100%;
+            height: 100%;
+            top: -100%;
+            left: 0%;
+            background-color: var(--white);
+            position: absolute;
+            transition: 0.3s cubic-bezier(0.785, 0.135, 0.15, 0.86);
+        }
+
+        &:hover {
+            color: var(--black);
+
+            &::after,
+            &::before {
+                left: 0;
+                top: 0;
+            }
+        }
     }
 
     &__about {
-        margin-top: 40px;
+        margin-top: 30px;
+
         h1 {
             font-size: 32px;
             font-weight: 600;
@@ -95,8 +132,10 @@
     &__description-raw {
         line-height: 130%;
         font-weight: 300;
+
         p {
             margin-bottom: 20px;
+
             &:last-child {
                 margin-bottom: 5px;
             }
@@ -107,6 +146,7 @@
         div {
             display: inline;
         }
+
         span {
             cursor: pointer;
             padding: 3px;
@@ -133,6 +173,7 @@
     &__screen {
         width: 100%;
         height: 98px;
+
         img {
             border-radius: 5px;
             max-width: 100%;
@@ -142,38 +183,146 @@
 
 .add-mygames {
     position: relative;
-    &:hover {
-        .add-mygames__body {
-            opacity: 1;
-            visibility: visible;
+    width: 100%;
+    text-align: center;
+
+    p {
+        padding: 1px 0;
+    }
+
+    &__popup {
+        z-index: 9999;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        background-color: var(--mBlack);
+        border-radius: 20px;
+        overflow: hidden;
+        padding: 30px;
+        transform: translateX(-50%) translateY(-50%);
+
+        h1 {
+            margin-bottom: 5px;
+            font-size: 32px;
+            font-weight: 800;
+            text-align: center;
         }
     }
-    &__body {
-        opacity: 0;
-        margin-top: 10px;
-        visibility: hidden;
-        position: absolute;
-        background-color: var(--dRed);
-        left: 0;
-        top: 100%;
-        width: 100%;
-        border-radius: 10px;
-        padding: 10px 5px;
-    }
-    span {
-        top: 100%;
-        left: 0;
-        position: absolute;
-        display: block;
-        width: 100%;
-        height: 10px;
-    }
-    li {
-        cursor: pointer;
-        list-style-type: none;
-        padding: 10px;
-        &:hover {
+
+    &__options {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+
+        li {
+            display: flex;
+            color: var(--white);
+            cursor: pointer;
+            list-style-type: none;
+            background-color: var(--black);
+            padding: 15px 20px;
+            margin: 10px 0;
             border-radius: 10px;
+            transition: 0.3s ease;
+
+            input {
+                width: 0;
+                height: 0;
+            }
+
+            div {
+                p {
+                    font-size: 18px;
+                    font-weight: 600;
+                    white-space: nowrap;
+                }
+
+                span {
+                    font-size: 12px;
+                    white-space: nowrap;
+                }
+            }
+
+            &:hover {
+                background-color: var(--lRed);
+            }
+        }
+    }  
+
+    &__rating {
+        margin: 15px 0;
+        h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+    }
+
+    &__rating-values {
+        margin: 10px 0;
+        display: grid;
+        column-gap: 5px;
+        grid-template-columns: repeat(11, 1fr);
+        list-style-type: none;
+        label {
+            border-radius: 50%;
+        }
+        li {
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: var(--black);
+            text-align: center;
+            transition: 0.2s ease background-color;
+            border-radius: 50%;
+            &:hover {
+                background-color: var(--lRed);
+            }
+            input {
+                // width: 0;
+                // height: 0;
+            }
+            span {
+                &::first-letter {
+                    text-transform: uppercase;
+                }
+            }
+        }
+    }
+    &__review {
+        overflow: hidden;
+        border-radius: 20px;
+
+        textarea {
+            padding: 20px;
+            width: 100%;
+            height: 100px;
+            resize: none;
+            color: var(--white);
+            font-size: 18px;
+            background-color: var(--black);
+
+            &::placeholder {
+                font-size: 16px;
+                font-weight: 700;
+            }
+        }
+    }
+    &__add-to-collection {
+        margin-top: 15px;
+        width: 100%;
+        background-color: var(--black);
+        border-radius: 20px;
+        padding: 15px;
+        color: var(--white);
+        font-size: 18px;
+        font-weight: 600;
+        transition: 0.3s ease;
+        &:hover {
             background-color: var(--lRed);
         }
     }
