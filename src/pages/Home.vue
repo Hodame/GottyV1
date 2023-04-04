@@ -23,6 +23,7 @@
 import GameCard from '../components/GameCard.vue';
 import { ref, onMounted } from 'vue';
 import { useRouter } from "vue-router"
+import { routeNames } from '../router/routeNames';
 
 type GCard = {
     id: number
@@ -68,7 +69,7 @@ onMounted(async () => {
 })
 
 const openGame = (card: GCard) => {
-    router.push({ name: "GamePage", params: { gameId: card.id } })
+    router.push({ name: routeNames.GamePage, params: { gameId: card.id } })
 }
 </script>
 

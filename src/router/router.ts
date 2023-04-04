@@ -12,12 +12,12 @@ const router = createRouter({
             meta: {
                 requiresLoggedOut: true
             },
-            redirect: routeNames.Login,
+            redirect: {name: routeNames.Login},
             children: [
                 {
                     path: "/login",
                     name: routeNames.Login,
-                    component: () => import("../pages/login.vue")
+                    component: () => import("../pages/Login.vue")
                 },
                 {
                     path: "/register",

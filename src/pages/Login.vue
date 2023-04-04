@@ -47,16 +47,18 @@ import { ref } from 'vue';
 import router from '../router/router';
 const email = ref("")
 const password = ref("")
+
 const login = () => {
     signInWithEmailAndPassword(auth, email.value, password.value)
         .then((user) => {
-            router.replace({ path: "/"})
+            router.replace({name: routeNames.Home})
         })
         .catch((error) => {
             console.log("Error", error);
             alert(error)
         })
 }
+
 </script>
 
 <style scoped lang="scss"></style>

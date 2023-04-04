@@ -6,7 +6,7 @@
         <div v-if="logged" class="sidebar__profile">
             <RouterLink :to="{ name: routeNames.Profile }">
                 <div class="sidebar__user">
-                    <p>{{ currentUser.displayName}}</p>
+                    <p>{{ currentUser.displayName }}</p>
                     <img :src="currentUser.photoURL" alt="avatar">
                 </div>
             </RouterLink>
@@ -109,7 +109,7 @@ import { auth } from '../firebase/config';
 import { ref } from 'vue';
 
 type CurrentUser = {
-    displayName: string | null, 
+    displayName: string | null,
     photoURL: string | undefined
 }
 
@@ -118,6 +118,7 @@ const currentUser = ref<CurrentUser>({
     displayName: "",
     photoURL: "",
 })
+
 onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUser.value.displayName = user.displayName

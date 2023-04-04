@@ -1,17 +1,21 @@
 .user-games {
 	margin-top: 40px;
+	&__no-games {
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 
-	li {
-		cursor: pointer;
-		list-style-type: none;
-		width: 400px;
-		border-radius: 20px;
-		overflow: hidden;
-		aspect-ratio: 16 / 9;
+		p {
+			font-size: 24px;
+			font-weight: 500;
+			color: var(--white);
+		}
 	}
 
 	&__head {
 		margin: 10px 0;
+		margin-top: 20px;
 		display: flex;
 		justify-content: space-between;
 
@@ -51,13 +55,17 @@
 	}
 
 	&__list {
-		overflow: auto;
 		display: flex;
 		gap: 20px;
 	}
 
 	&__game {
 		position: relative;
+		cursor: pointer;
+		list-style-type: none;
+		border-radius: 20px;
+		overflow: hidden;
+		aspect-ratio: 16 / 9;
 
 		&:hover {
 			.user-games__background {
@@ -89,6 +97,25 @@
 		}
 	}
 
+	&__rating {
+		z-index: 101;
+		position: absolute;
+		top: 20px;
+		right: 15px;
+
+		span {
+			border-radius: 50%;
+			background-color: var(--white);
+			width: 30px;
+			height: 30px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: var(--black);
+			font-weight: 700;
+		}
+	}
+
 	&__body {
 		transition: 0.4s ease;
 		opacity: 0;
@@ -107,10 +134,11 @@
 	&__title {
 		font-size: 24px;
 		font-weight: 700;
+		margin: 0 0 10px 0;
 	}
 
 	&__metacritic {
-		margin: 10px 0;
+		margin: 0 0 10px 0;
 		font-size: 14px;
 		padding: 1px 5px;
 		border: 2px solid green;

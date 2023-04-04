@@ -57,15 +57,18 @@
     &__user-profile {
         display: flex;
         align-items: center;
+
         div {
             display: flex;
             align-items: center;
         }
+
         img {
             cursor: pointer;
             width: 35px;
             height: 35px;
         }
+
         p {
             color: var(--white);
             cursor: pointer;
@@ -83,6 +86,7 @@
     &__auth {
         display: flex;
         align-items: center;
+
         button {
             background-color: transparent;
             color: var(--white);
@@ -90,6 +94,7 @@
             font-weight: 500;
             margin-right: 15px;
             transition: 0.2s ease;
+
             &:hover {
                 color: var(--lRed);
             }
@@ -100,8 +105,9 @@
         margin-left: 15px;
         display: flex;
         align-items: center;
+        position: relative;
         cursor: pointer;
-
+        user-select: none;
         svg {
             path {
                 transition: 0.3s ease;
@@ -111,6 +117,33 @@
                 path {
                     fill: var(--lRed);
                 }
+            }
+        }
+    }
+
+    &__settings-popup {
+        position: absolute;
+        width: 150px;
+        background-color: var(--dRed);
+        padding: 10px;
+        border-radius: 10px;
+        top: calc(100% - 10px);
+        right: 0;
+
+        button {
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            background-color: transparent;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--white);
+            font-weight: 600;
+            transition: 0.2 s ease;
+            &:hover {
+                background-color: var(--white);
+                color: var(--black);
             }
         }
     }

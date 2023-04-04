@@ -39,7 +39,6 @@ onAuthStateChanged(auth, (user) => {
         if (user.photoURL != null) {
             currentUser.value.photoURL = user.photoURL
         }
-        console.log(user)
         logged.value = true
     } else {
         console.log("error");

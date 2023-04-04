@@ -73,7 +73,7 @@
         </div>
         <div class="navigation__user">
             <div v-if="logged" class="navigation__user-profile">
-                <RouterLink :to="{ name: routeNames.Profile}">
+                <RouterLink :to="{ name: routeNames.Profile }">
                     <div>
                         <img :src="currentUser.photoURL" alt="avatar">
                         <p>My games</p>
@@ -89,7 +89,7 @@
 
                 </RouterLink>
             </div>
-            <div class="navigation__settings">
+            <div @click="settingsShow = !settingsShow" class="navigation__settings">
                 <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M5 10C6.10457 10 7 10.8954 7 12C7 13.1046 6.10457 14 5 14C3.89543 14 3 13.1046 3 12C3 10.8954 3.89543 10 5 10Z"
@@ -101,10 +101,9 @@
                         d="M21 12C21 10.8954 20.1046 10 19 10C17.8954 10 17 10.8954 17 12C17 13.1046 17.8954 14 19 14C20.1046 14 21 13.1046 21 12Z"
                         fill="#fff" />
                 </svg>
-                <div v-if="logged" class="navigation__settings-popup">
-                    <button @click="logOut">Log out</button>
-                </div>
-
+            </div>
+            <div v-if="logged" v-show="settingsShow" ref="navSettings" class="navigation__settings-popup">
+                <button @click="logOut">Log out</button>
             </div>
         </div>
     </div>
@@ -157,6 +156,8 @@ const logged = ref(false)
 const currentUser = ref<CurrentUser>({
     photoURL: "",
 })
+const navSettings = ref<HTMLDivElement>()
+const settingsShow = ref(false)
 const searchResult = ref<gameList>([
     {
         background_image: "",
@@ -223,6 +224,7 @@ const logOut = () => {
             alert(error)
         })
 }
+
 onAuthStateChanged(auth, (user) => {
     if (user) {
         if (user.photoURL != null) {
@@ -236,4 +238,5 @@ onAuthStateChanged(auth, (user) => {
 
 
 onClickOutside(search_box, () => searchValue.value ? searchValue.value = "" : undefined)
+onClickOutside(navSettings, () => settingsShow.value = false)
 </script>
