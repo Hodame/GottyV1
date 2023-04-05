@@ -1,13 +1,15 @@
 <template>
 	<div class="user-page">
 		<div class="user-page__info">
-			<div class="user-page__id">@{{ currentUser.displayName }}</div>
 			<div class="user-page__avatar">
 				<img :src="currentUser.photoURL" alt="">
 			</div>
-			<div class="user-page__settings">
-				<span>Settings</span>
-			</div>
+			<div class="user-page__id">@{{ currentUser.displayName }}</div>
+			<RouterLink :to="{ name: routeNames.Settings }">
+				<div class="user-page__settings">
+					<span>Settings</span>
+				</div>
+			</RouterLink>
 		</div>
 		<div class="user-page__tabs">
 			<div class="user-page__tab">Games</div>
@@ -22,28 +24,29 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase/config';
 import { ref } from 'vue';
+import { routeNames } from '../router/routeNames';
 
 type CurrentUser = {
-    displayName: string | null, 
-    photoURL: string | undefined
+	displayName: string | null,
+	photoURL: string | undefined
 }
 
 const logged = ref(false)
 const currentUser = ref<CurrentUser>({
-    displayName: "",
-    photoURL: "",
+	displayName: "",
+	photoURL: "",
 })
 onAuthStateChanged(auth, (user) => {
-    if (user) {
-        currentUser.value.displayName = user.displayName
-        if (user.photoURL != null) {
-            currentUser.value.photoURL = user.photoURL
-        }
-        logged.value = true
-    } else {
-        console.log("error");
-        logged.value = false
-    }
+	if (user) {
+		currentUser.value.displayName = user.displayName
+		if (user.photoURL != null) {
+			currentUser.value.photoURL = user.photoURL
+		}
+		logged.value = true
+	} else {
+		console.log("error");
+		logged.value = false
+	}
 })
 </script>
 
@@ -60,15 +63,16 @@ onAuthStateChanged(auth, (user) => {
 
 	&__id {
 		font-size: 32px;
-		margin-right: 10px;
+		margin-left: 15px;
+		flex: 1 1;
 	}
 
 	&__avatar {
-		flex: 1 1;
-
 		img {
-			width: 50px;
-			height: 50px;
+			border-radius: 50%;
+			overflow: hidden;
+			width: 100px;
+			height: 100px;
 			object-fit: cover;
 		}
 	}

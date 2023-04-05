@@ -66,23 +66,6 @@ const register = () => {
                 displayName: userName.value,
                 avatar: "https://cdn-icons-png.flaticon.com/512/10264/10264490.png",
                 uid: user.user.uid,
-                games: [
-                    {
-                        collectionName: "want",
-                        count: 0,
-                        games: [],
-                    },
-                    {
-                        collectionName: "playing",
-                        count: 0,
-                        games: [],
-                    },
-                    {
-                        collectionName: "beaten",
-                        count: 0,
-                        games: [],
-                    }
-                ]
             })
         })
         .catch((error) => {

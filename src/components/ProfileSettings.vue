@@ -16,7 +16,7 @@
 		</div>
 		<div class="profile-settings__names">
 			<div class="profile-settings__input-box">
-				<input placeholder="Name" type="text" name="name">
+				<input placeholder="Name" v-model="userNameField" type="text" name="name">
 			</div>
 			<div class="profile-settings__input-box">
 				<input placeholder="Nickname" v-model="currentUser.displayName" type="text" name="nickname">
@@ -24,39 +24,61 @@
 
 		</div>
 		<div class="profile-settings__bio">
-			<textarea placeholder="Bio" name="" id="" cols="30" rows="10"></textarea>
+			<textarea v-model="userBioField" placeholder="Bio" name="" id="" cols="30" rows="10"></textarea>
 		</div>
-		<button class="profile-settings__save">Save changes</button>
+		<button @click="saveChanges" class="profile-settings__save">Save changes</button>
 
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { getDocs, collection } from 'firebase/firestore';
-import { ref as storageRef, uploadString, getMetadata } from "firebase/storage"
+import { onMounted, ref, watch } from 'vue';
+import { ref as storageRef, uploadString, getDownloadURL } from "firebase/storage"
 import { onAuthStateChanged, updateProfile } from 'firebase/auth';
-import { auth, storage } from '../firebase/config';
+import { updateDoc, doc, getDoc } from 'firebase/firestore';
+import { auth, storage, db } from '../firebase/config';
 
-const currentUser = ref<{ displayName: string | null, photoUrl: string | undefined }>({
+const currentUser = ref<{ displayName: string | null, photoUrl: string | undefined, uid: string }>({
 	displayName: "",
-	photoUrl: ""
+	photoUrl: "",
+	uid: ""
 })
 const userAvatar = ref()
 const userAvatarFile = ref()
-
-onAuthStateChanged(auth, (user) => {
+const userNameField = ref('...')
+const userBioField = ref('...')
+onAuthStateChanged(auth, async (user) => {
 	if (user) {
 		currentUser.value.displayName = user.displayName
 		if (user.photoURL != null) {
+			currentUser.value.uid = user.uid
 			currentUser.value.photoUrl = user.photoURL
+			const userDoc = await getDoc(doc(db, "users", currentUser.value.uid))
+			userNameField.value = userDoc?.data()?.userName
+			userBioField.value = userDoc?.data()?.userBio
+
 		}
 	}
 })
 
+watch(userAvatarFile, () => {
+	onAuthStateChanged(auth, async (user) => {
+		const uploadedAvatar = storageRef(storage, "userAvatar.jpg")
+		uploadString(uploadedAvatar, userAvatarFile.value, "data_url")
+		if (user) {
+			getDownloadURL(uploadedAvatar)
+				.then(async (avatar) => {
+					await updateProfile(user, {
+						photoURL: avatar
+					})
+				})
+		}
+	})
+})
+
 function changeAvatar(e: Event) {
 	if (e.target != null) {
-		userAvatar.value = e.target.files
+		userAvatar.value = (<HTMLInputElement>e.target).files
 		let fileReader = new FileReader()
 		fileReader.onload = function (event) {
 			if (event.target != null) {
@@ -67,32 +89,13 @@ function changeAvatar(e: Event) {
 	}
 }
 
-
-
-watch(userAvatarFile, () => {
-	onAuthStateChanged(auth, async (user) => {
-		const uploadedAvatar = storageRef(storage, "userAvatar.jpg")
-		uploadString(uploadedAvatar, userAvatarFile.value, "data_url").then((snapshot) => {
-			console.log("hello");
-		})
-		if (user) {
-			getMetadata(uploadedAvatar)
-				.then(async (avatar) => {
-					console.log(avatar);
-					
-					await updateProfile(user, {
-						photoURL: avatar.fu
-					})
-				})
-			await updateProfile(user, {
-				photoURL: userAvatarFile.value
-
-			})
-		}
+async function saveChanges() {
+	await updateDoc(doc(db, "users", currentUser.value.uid), {
+		userName: userNameField.value,
+		userBio: userBioField.value
 	})
-})
 
-
+}
 </script>
 
 <style scoped lang="scss"> .profile-settings {

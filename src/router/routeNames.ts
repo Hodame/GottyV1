@@ -9,5 +9,7 @@ export const routeNames = {
     Login: "Login", 
     Register: "Register",
     Settings: "Settings",
-    ProfileSettings: "ProfileSettings"
+    ProfileSettings: "ProfileSettings",
+    EmailSettings: "EmailSettings",
+    PasswordSettings: "PasswordSettings",
 }

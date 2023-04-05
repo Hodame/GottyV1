@@ -47,8 +47,10 @@
             font-weight: 700;
         }
         img {
-            width: 30px;
-            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            width: 40px;
+            height: 40px;
         }
     }
     &__releases {

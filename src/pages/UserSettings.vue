@@ -4,19 +4,28 @@
 			<h1>Settings</h1>
 		</div>
 		<div class="user-settings__tabs">
-			<div class="user-settings__tab">
+			<div :style="{ color: route.name === routeNames.ProfileSettings ? 'var(--lRed)' : ''}" class="user-settings__tab">
 				<p>Profile</p>
 			</div>
-			<div class="user-settings__tab">
+			<div :style="{ color: route.name === routeNames.EmailSettings ? 'var(--lRed)' : ''}" class="user-settings__tab">
 				<p>My email</p>
 			</div>
-			<div class="user-settings__tab">
-				<p>My Passowrd</p>
+			<div :style="{ color: route.name === routeNames.PasswordSettings ? 'var(--lRed)' : ''}" class="user-settings__tab">
+				<p>My passowrd</p>
 			</div>
 		</div>
 		<RouterView />
 	</div>
 </template>
+
+<script setup lang="ts">
+import { useRoute } from "vue-router";
+import { routeNames } from "../router/routeNames";
+
+const route = useRoute()
+console.log(route.name);
+
+</script>
 
 <style scoped lang="scss">
 .user-settings {
