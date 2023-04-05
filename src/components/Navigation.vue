@@ -118,7 +118,7 @@ import SwitchIcon from '../assets/ico/gameCard/SwitchIcon.vue'
 
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { onClickOutside } from '@vueuse/core'
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { ref, watchEffect } from 'vue';
 import { routeNames } from '../router/routeNames';
 import { auth } from '../firebase/config';
@@ -147,7 +147,6 @@ type game = {
     }>,
 }
 
-const route = useRouter()
 const searchValue = ref('')
 const API_KEY = "e0bd00b887d44e569f95cce1824ffd92"
 const search_box = ref<HTMLDivElement>()
@@ -208,7 +207,7 @@ watchEffect((onInvalidate) => {
 })
 
 const pushToGamePage = (id: number) => {
-    route.replace({ name: routeNames.GamePage, params: { gameId: id } })
+    router.replace({ name: routeNames.GamePage, params: { gameId: id } })
     searchValue.value = ""
 }
 

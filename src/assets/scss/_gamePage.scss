@@ -22,7 +22,7 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 1;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0) 0%, rgb(0, 0, 0) 100%);
+            background: radial-gradient(circle, rgba(27, 27, 27, 0) 0%, rgb(27, 27, 27) 100%);
         }
 
         &::before {
@@ -34,7 +34,7 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 1;
-            background: linear-gradient(0deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 48%, rgba(0, 0, 0, 1) 100%);
+            background: linear-gradient(0deg, hwb(0 11% 89%) 0%, rgba(27, 27, 27, 0) 48%, rgba(27, 27, 27, 1) 100%);
         }
     }
 
@@ -217,7 +217,6 @@
 
     &__screens {
         margin-top: 100px;
-        height: 100%;
         display: grid;
         gap: 10px;
         grid-template-columns: 1fr 1fr;

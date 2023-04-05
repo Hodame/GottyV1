@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage"
 const firebaseConfig = {
     apiKey: "AIzaSyDBczS9VRF9Upg-qWZqMfVFbTvi-Iaw8RU",
     authDomain: "gotty-your-games-collection.firebaseapp.com",
@@ -13,8 +14,10 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app)
+const storage = getStorage()
 const db = getFirestore(app)
 export {
     auth,
-    db
+    db,
+    storage
 }

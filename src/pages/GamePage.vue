@@ -489,7 +489,8 @@ const updateUserCollection = async (selectedUserCollection: string, rating: stri
             if (selectedUserCollection === gameInUserCollection.value.collection) {
                 await updateDoc(doc(db, 'users', currentUser.value.uid, selectedUserCollection, gameInUserCollection.value.docUid), {
                     userRating: rating,
-                    collection: selectedCollection.value
+                    userReview: userReview.value,
+                    collection: selectedCollection.value,
                 })
                     .then(() => popupOpened.value = false)
             }

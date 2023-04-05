@@ -57,6 +57,22 @@ const router = createRouter({
                             component: () => import("../components/UserGames.vue")
                         }
                     ]
+                },
+                {
+                    path: '/settings',
+                    name: routeNames.Settings,
+                    component: () => import("../pages/UserSettings.vue"),
+                    meta: {
+                        requiresAuth: true
+                    },
+                    redirect: "/settings/profile",
+                    children: [
+                        {
+                            path: "/settings/profile",
+                            name: routeNames.ProfileSettings,
+                            component: () => import("../components/ProfileSettings.vue")
+                        }
+                    ]
                 }
             ]
         }

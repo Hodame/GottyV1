@@ -8,4 +8,6 @@ export const routeNames = {
     UserGames: "UserGames",
     Login: "Login", 
     Register: "Register",
+    Settings: "Settings",
+    ProfileSettings: "ProfileSettings"
 }
