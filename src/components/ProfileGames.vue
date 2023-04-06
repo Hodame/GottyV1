@@ -2,7 +2,7 @@
 	<div v-if="!loading" class="user-games">
 		<template v-if="gamesWant.length === 0 && gamesBeaten.length === 0 && gamesPlaying.length === 0">
 			<div class="user-games__no-games">
-				<p>No games</p>
+				<p>Add some games first!</p>
 			</div>
 		</template>
 		<div class="user-games__results-body">
@@ -15,15 +15,15 @@
 					</div>
 					<button>See all</button>
 				</div>
-				<swiper :slides-per-view="3" :space-between="20" class="user-games__list">
+				<swiper :slides-per-view="3" :space-between="20" @swiper="onSwiper" @slideChange="onSlideChange"
+					class="user-games__list">
 					<swiper-slide v-for="(game, idx) in gamesWant" :key="idx" class="user-games__game">
 						<RouterLink :to="{ name: routeNames.GamePage, params: { gameId: game.gameId } }">
 							<div class="user-games__game-body">
 								<div class="user-games__background">
 									<img :src="game.gamePoster" alt="">
 								</div>
-								<div v-if="game.userRating != 'No'" class="user-games__rating"><span>{{ game.userRating
-								}}</span></div>
+								<div v-if="game.userRating != 'No'" class="user-games__rating"><span>{{ game.userRating }}</span></div>
 								<div class="user-games__body">
 									<div class="user-games__title">{{ game.gameName }}</div>
 									<span v-if="game.gameMetacritic" class="user-games__metacritic">{{ game.gameMetacritic
@@ -44,15 +44,15 @@
 					</div>
 					<button>See all</button>
 				</div>
-				<swiper :slides-per-view="3" :space-between="20" class="user-games__list">
+				<swiper :slides-per-view="3" :space-between="20" @swiper="onSwiper" @slideChange="onSlideChange"
+					class="user-games__list">
 					<swiper-slide v-for="(game, idx) in gamesPlaying" :key="idx" class="user-games__game">
 						<RouterLink :to="{ name: routeNames.GamePage, params: { gameId: game.gameId } }">
 							<div class="user-games__game-body">
 								<div class="user-games__background">
 									<img :src="game.gamePoster" alt="">
 								</div>
-								<div v-if="game.userRating != 'No'" class="user-games__rating"><span>{{ game.userRating
-								}}</span></div>
+								<div v-if="game.userRating != 'No'" class="user-games__rating"><span>{{ game.userRating }}</span></div>
 								<div class="user-games__body">
 									<div class="user-games__title">{{ game.gameName }}</div>
 									<span v-if="game.gameMetacritic" class="user-games__metacritic">{{ game.gameMetacritic
@@ -73,15 +73,15 @@
 					</div>
 					<button>See all</button>
 				</div>
-				<swiper :slides-per-view="3" :space-between="20" class="user-games__list">
+				<swiper :slides-per-view="3" :space-between="20" @swiper="onSwiper" @slideChange="onSlideChange"
+					class="user-games__list">
 					<swiper-slide v-for="(game, idx) in gamesBeaten" :key="idx" class="user-games__game">
 						<RouterLink :to="{ name: routeNames.GamePage, params: { gameId: game.gameId } }">
 							<div class="user-games__game-body">
 								<div class="user-games__background">
 									<img :src="game.gamePoster" alt="">
 								</div>
-								<div v-if="game.userRating != 'No'" class="user-games__rating"><span>{{ game.userRating
-								}}</span></div>
+								<div v-if="game.userRating != 'No'" class="user-games__rating"><span>{{ game.userRating }}</span></div>
 								<div class="user-games__body">
 									<div class="user-games__title">{{ game.gameName }}</div>
 									<span v-if="game.gameMetacritic" class="user-games__metacritic">{{ game.gameMetacritic
@@ -107,12 +107,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref } from 'vue';
 import { collection, getDocs, } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
 import { routeNames } from '../router/routeNames';
 import { Swiper, SwiperSlide } from 'swiper/vue';
-import { useRoute } from 'vue-router';
+
 import 'swiper/css';
 
 type GameInfo = Array<{
@@ -131,87 +131,79 @@ const gamesPlaying = ref<GameInfo>([
 ])
 const gamesBeaten = ref<GameInfo>([
 ])
-const route = useRoute()
-const userNickname = ref(route.params.userId)
-const userUid = ref('')
+const currentUserId = auth.currentUser?.uid
 const loading = ref(true)
-
-const loadContent = async () => {
+onMounted(async () => {
 	try {
-		loading.value = true
-		const users = await getDocs(collection(db, "users"))
-		users.forEach((user) => {			
-			if (user.data().displayName == userNickname.value) {
-				userUid.value = user.data().uid
-			}
-		})
-		const want = await getDocs(collection(db, "users", userUid.value, "want"))
-		want.forEach((doc) => {
-			const game = {
-				gameDocId: doc.id,
-				gameDateRelease: doc.data().gameDateRelease,
-				gameId: doc.data().gameId,
-				gameMetacritic: doc.data().gameMetacritic,
-				gameName: doc.data().gameName,
-				gamePoster: doc.data().gamePoster,
-				userRating: doc.data().userRating
-			}
-			gamesWant.value.unshift(game)
-		})
-		const playing = await getDocs(collection(db, "users", userUid.value, "playing"))
-		playing.forEach((doc) => {
-			const game = {
-				gameDocId: doc.id,
-				gameDateRelease: doc.data().gameDateRelease,
-				gameId: doc.data().gameId,
-				gameMetacritic: doc.data().gameMetacritic,
-				gameName: doc.data().gameName,
-				gamePoster: doc.data().gamePoster,
-				userRating: doc.data().userRating
-			}
-			gamesPlaying.value.unshift(game)
-		})
-		const beaten = await getDocs(collection(db, "users", userUid.value, "beaten"))
-		beaten.forEach((doc) => {
-			const game = {
-				gameDocId: doc.id,
-				gameDateRelease: doc.data().gameDateRelease,
-				gameId: doc.data().gameId,
-				gameMetacritic: doc.data().gameMetacritic,
-				gameName: doc.data().gameName,
-				gamePoster: doc.data().gamePoster,
-				userRating: doc.data().userRating
-			}
-			gamesBeaten.value.unshift(game)
-		})
+		if (currentUserId != null) {
+			const want = await getDocs(collection(db, "users", currentUserId, "want"))
+			want.forEach((doc) => {
+				const game = {
+					gameDocId: doc.id,
+					gameDateRelease: doc.data().gameDateRelease,
+					gameId: doc.data().gameId,
+					gameMetacritic: doc.data().gameMetacritic,
+					gameName: doc.data().gameName,
+					gamePoster: doc.data().gamePoster,
+					userRating: doc.data().userRating
+				}
+				gamesWant.value.unshift(game)
+			})
+			const playing = await getDocs(collection(db, "users", currentUserId, "playing"))
+			playing.forEach((doc) => {
+				const game = {
+					gameDocId: doc.id,
+					gameDateRelease: doc.data().gameDateRelease,
+					gameId: doc.data().gameId,
+					gameMetacritic: doc.data().gameMetacritic,
+					gameName: doc.data().gameName,
+					gamePoster: doc.data().gamePoster,
+					userRating: doc.data().userRating
+				}
+				gamesPlaying.value.unshift(game)
+			})
+			const beaten = await getDocs(collection(db, "users", currentUserId, "beaten"))
+			beaten.forEach((doc) => {
+				const game = {
+					gameDocId: doc.id,
+					gameDateRelease: doc.data().gameDateRelease,
+					gameId: doc.data().gameId,
+					gameMetacritic: doc.data().gameMetacritic,
+					gameName: doc.data().gameName,
+					gamePoster: doc.data().gamePoster,
+					userRating: doc.data().userRating
+				}
+				gamesBeaten.value.unshift(game)
+			})
+		}
 	}
 	finally {
+		console.log(gamesWant.value.length, gamesPlaying.value.length, gamesBeaten.value.length);
+
 		loading.value = false
 	}
-}
-
-onMounted(loadContent)
-
-watch(() => route.params.userId, () => {
-	userNickname.value = route.params.userId
-	gamesWant.value = []
-	gamesPlaying.value = []
-	gamesBeaten.value = []
-	loadContent()
 })
 
+const onSwiper = (swiper: {}) => {
+	console.log(swiper);
+};
+
+const onSlideChange = () => {
+	console.log('slide change');
+};
+
 const dateRelease = (released: string) => {
-	const arrDate = released.split("-")
-	const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", 'Sep', "Oct", "Nov", "Dec"]
-	const gameMonthDate = months[parseInt(arrDate[1].replace('0', "")) - 1]
-	let gameDayDate
-	if (arrDate[2] === '10' || arrDate[2] === '20' || arrDate[2] === '30') {
-		gameDayDate = parseInt(arrDate[2])
-	} else {
-		gameDayDate = parseInt(arrDate[2].replace("0", ""))
-	}
-	const gameDateRelease = gameMonthDate + " " + gameDayDate + ", " + arrDate[0]
-	return gameDateRelease
+    const arrDate = released.split("-")
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", 'Sep', "Oct", "Nov", "Dec"]
+    const gameMonthDate = months[parseInt(arrDate[1].replace('0', "")) - 1]
+    let gameDayDate
+    if (arrDate[2] === '10' || arrDate[2] === '20' || arrDate[2] === '30') {
+        gameDayDate = parseInt(arrDate[2])
+    } else {
+        gameDayDate = parseInt(arrDate[2].replace("0", ""))
+    }
+    const gameDateRelease = gameMonthDate + " " + gameDayDate + ", " + arrDate[0]
+    return gameDateRelease
 }
 
 

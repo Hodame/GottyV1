@@ -65,7 +65,6 @@ onMounted(async () => {
         loading.value = false
     }
 
-
 })
 
 const openGame = (card: GCard) => {

@@ -4,7 +4,7 @@
 			<h1>Avatar</h1>
 			<div class="profile-settings__avatar-body">
 				<div class="profile-settings__img">
-					<img :src="currentUser.photoUrl" alt="">
+					<img :src="avatar.get()" alt="">
 				</div>
 				<input @change="changeAvatar" type="file" name="uploadFile" id="file">
 				<label for="file" class="profile-settings__change">
@@ -26,17 +26,30 @@
 		<div class="profile-settings__bio">
 			<textarea v-model="userBioField" placeholder="Bio" name="" id="" cols="30" rows="10"></textarea>
 		</div>
-		<button @click="saveChanges" class="profile-settings__save">Save changes</button>
+		<button @click="saveChanges" :class="{ loading: loadingBtn }" class="profile-settings__save">{{ loadingBtn
+			? '' : 'Save changes' }}
+			<svg v-show="loadingBtn" version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg"
+				xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="30px" height="30px" viewBox="0 0 50 50"
+				style="enable-background:new 0 0 50 50;" xml:space="preserve">
+				<path fill="#fff"
+					d="M25.251,6.461c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615V6.461z">
+					<animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 25 25"
+						to="360 25 25" dur="0.6s" repeatCount="indefinite" />
+				</path>
+			</svg></button>
 
 	</div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { ref as storageRef, uploadString, getDownloadURL } from "firebase/storage"
 import { onAuthStateChanged, updateProfile } from 'firebase/auth';
 import { updateDoc, doc, getDoc } from 'firebase/firestore';
 import { auth, storage, db } from '../firebase/config';
+import { useAvatar } from '../assets/utils';
+
+const avatar = useAvatar()
 
 const currentUser = ref<{ displayName: string | null, photoUrl: string | undefined, uid: string }>({
 	displayName: "",
@@ -47,12 +60,14 @@ const userAvatar = ref()
 const userAvatarFile = ref()
 const userNameField = ref('...')
 const userBioField = ref('...')
+const loadingBtn = ref(false)
+
 onAuthStateChanged(auth, async (user) => {
 	if (user) {
 		currentUser.value.displayName = user.displayName
 		if (user.photoURL != null) {
 			currentUser.value.uid = user.uid
-			currentUser.value.photoUrl = user.photoURL
+			avatar.set(user.photoURL)
 			const userDoc = await getDoc(doc(db, "users", currentUser.value.uid))
 			userNameField.value = userDoc?.data()?.userName
 			userBioField.value = userDoc?.data()?.userBio
@@ -63,14 +78,18 @@ onAuthStateChanged(auth, async (user) => {
 
 watch(userAvatarFile, () => {
 	onAuthStateChanged(auth, async (user) => {
-		const uploadedAvatar = storageRef(storage, "userAvatar.jpg")
+		const uploadedAvatar = storageRef(storage, currentUser.value.displayName + "UserAvatar.jpg")
 		uploadString(uploadedAvatar, userAvatarFile.value, "data_url")
 		if (user) {
 			getDownloadURL(uploadedAvatar)
-				.then(async (avatar) => {
+				.then(async (newAvatar) => {
 					await updateProfile(user, {
-						photoURL: avatar
+						photoURL: newAvatar
 					})
+					await updateDoc(doc(db, "users", currentUser.value.uid), {
+						avatar: newAvatar
+					})
+						.then(() => avatar.set(newAvatar))
 				})
 		}
 	})
@@ -90,10 +109,22 @@ function changeAvatar(e: Event) {
 }
 
 async function saveChanges() {
-	await updateDoc(doc(db, "users", currentUser.value.uid), {
-		userName: userNameField.value,
-		userBio: userBioField.value
-	})
+	try {
+		loadingBtn.value = true
+		await updateDoc(doc(db, "users", currentUser.value.uid), {
+			userName: userNameField.value,
+			userBio: userBioField.value
+		})
+	}
+	catch {
+
+	}
+	finally {
+		loadingBtn.value = true
+		setTimeout(() => {
+			loadingBtn.value = false
+		}, 500);
+	}
 
 }
 </script>
@@ -201,7 +232,19 @@ async function saveChanges() {
  		font-size: 16px;
  		font-weight: 500;
  		border-radius: 5px;
-
+		background-color: var(--white);
+		color: var(--black);
+		transition: 0.5s ease background-color;
+ 		&.loading {
+ 			display: flex;
+ 			align-items: center;
+ 			justify-content: center;
+ 			background-color: rgb(39, 148, 39);
+ 			color: var(--white);
+ 			width: 146.7px;
+ 			height: 40px;
+ 			padding: 0;
+ 		}
  	}
  }
 </style>

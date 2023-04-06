@@ -1,0 +1,44 @@
+.collections {
+	h1 {
+		font-size: 44px;
+		font-weight: 600;
+	}
+
+	&__items {
+		margin-top: 30px;
+		display: grid;
+		gap: 30px;
+		grid-template-columns: 1fr 1fr;
+		list-style-type: none;
+	}
+
+	&__item {
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		background-color: var(--mBlack);
+		border-radius: 10px;
+		display: flex;
+		padding: 15px;
+	}
+
+	&__background {
+		width: 50%;
+		height: 100%;
+		border-radius: 10px;
+	}
+
+	&__info {
+		margin-left: 15px;
+	}
+
+	&__name {
+		font-size: 28px;
+		font-weight: 600;
+	}
+
+	&__description {
+		margin-top: 10px;
+	}
+
+	&__games-count {}
+}

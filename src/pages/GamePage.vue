@@ -199,10 +199,11 @@ import { onClickOutside } from '@vueuse/core';
 import { addDoc, collection, getDocs, query, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { onMounted, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { auth, db } from '../firebase/config';
 import { routeNames } from '../router/routeNames';
 import router from '../router/router';
+import { watch } from 'vue';
 
 type GameInfo = {
     background_image: string,
@@ -349,13 +350,13 @@ onAuthStateChanged(auth, (user) => {
     }
 })
 
-onMounted(async () => {
+const loadContent = async () => {
     try {
+        loading.value = true
         const response = await fetch(`https://api.rawg.io/api/games/${route.params.gameId}?key=${API_KEY}`)
         gameInfo.value = await response.json()
         const responseScreen = await fetch(`https://api.rawg.io/api/games/${route.params.gameId}/screenshots?key=${API_KEY}`)
         gameScreens.value = await responseScreen.json()
-
         if (currentUser.value != null && currentUser.value.uid != undefined) {
             try {
                 const checkWantCollection = await getDocs(query(collection(db, "users", currentUser.value.uid, "want")))
@@ -400,16 +401,23 @@ onMounted(async () => {
                 console.log("Erorr" + error);
             }
         }
-
-        if (typeof route.params.gameId === "string") {
+        if (typeof route.params.gameId == "string") {
             const gameId = route.params.gameId
             const gameIdRef = ifGameHasInUserCollection.value.find(object => object.gameId === parseInt(gameId))
             if (gameIdRef) {
+                console.log(gameIdRef);
                 gameInUserCollection.value = gameIdRef
                 selectedRating.value = gameInUserCollection.value.userRating
                 selectedCollection.value = gameInUserCollection.value.collection
                 userReview.value = gameInUserCollection.value.userReview
                 deleteButtonShow.value = true
+            } else {                
+                selectedCollection.value = ""
+                gameInUserCollection.value.userRating = ""
+                gameInUserCollection.value.collection = ""
+                gameInUserCollection.value.userReview = ""
+                console.log(selectedCollection.value);
+                deleteButtonShow.value = false
             }
         }
     }
@@ -417,7 +425,11 @@ onMounted(async () => {
     finally {
         loading.value = false
     }
-})
+}
+
+onMounted(loadContent)
+
+watch(() => route.params.gameId, loadContent)
 
 const getGamePlatform = (id: number) => {
     return gameInfo.value.parent_platforms.find(thePlatform => thePlatform.platform.id === id)
@@ -427,7 +439,12 @@ const dateRelease = (released: string) => {
     const arrDate = released.split("-")
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", 'Sep', "Oct", "Nov", "Dec"]
     const gameMonthDate = months[parseInt(arrDate[1].replace('0', "")) - 1]
-    const gameDayDate = parseInt(arrDate[2].replace("0", ""))
+    let gameDayDate
+    if (arrDate[2] === '10' || arrDate[2] === '20' || arrDate[2] === '30') {
+        gameDayDate = parseInt(arrDate[2])
+    } else {
+        gameDayDate = parseInt(arrDate[2].replace("0", ""))
+    }
     const gameDateRelease = gameMonthDate + " " + gameDayDate + ", " + arrDate[0]
     return gameDateRelease
 }

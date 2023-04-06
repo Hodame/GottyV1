@@ -12,7 +12,7 @@ const router = createRouter({
             meta: {
                 requiresLoggedOut: true
             },
-            redirect: {name: routeNames.Login},
+            redirect: { name: routeNames.Login },
             children: [
                 {
                     path: "/login",
@@ -30,7 +30,7 @@ const router = createRouter({
             path: "/layout",
             name: routeNames.Layout,
             component: () => import("../pages/Main.vue"),
-            redirect: routeNames.Home,
+            redirect: "/",
             children: [
                 {
                     path: "/",
@@ -53,6 +53,24 @@ const router = createRouter({
                     children: [
                         {
                             path: "/profile/games",
+                            name: routeNames.ProfileGames,
+                            component: () => import("../components/ProfileGames.vue")
+                        },
+                        {
+                            path: "/profile/collections",
+                            name: routeNames.ProfileCollections,
+                            component: () => import("../components/ProfileCollections.vue")
+                        },
+                    ]
+                },
+                {
+                    path: "/@:userId",
+                    name: routeNames.UsersProfile,
+                    component: () => import("../pages/UserProfile.vue"),
+                    redirect: { name: routeNames.UserGames},
+                    children: [
+                        {
+                            path: "/@:userId/games",
                             name: routeNames.UserGames,
                             component: () => import("../components/UserGames.vue")
                         }

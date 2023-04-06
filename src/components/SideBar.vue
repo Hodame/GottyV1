@@ -7,7 +7,7 @@
             <RouterLink :to="{ name: routeNames.Profile }">
                 <div class="sidebar__user">
                     <p>{{ currentUser.displayName }}</p>
-                    <img :src="currentUser.photoURL" alt="avatar">
+                    <img :src="avatar.get()" alt="avatar">
                 </div>
             </RouterLink>
             <ul class="sidebar__profile-list">
@@ -107,6 +107,7 @@ import { routeNames } from '../router/routeNames';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase/config';
 import { ref } from 'vue';
+import { useAvatar } from '../assets/utils';
 
 type CurrentUser = {
     displayName: string | null,
@@ -119,11 +120,13 @@ const currentUser = ref<CurrentUser>({
     photoURL: "",
 })
 
+const avatar = useAvatar()
+
 onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUser.value.displayName = user.displayName
         if (user.photoURL != null) {
-            currentUser.value.photoURL = user.photoURL
+            avatar.set(user.photoURL)
         }
         logged.value = true
     } else {

@@ -11,11 +11,11 @@
             <input v-model="searchValue" type="text" placeholder="Search" class="navigation__search">
             <div class="navigation__search-result search-result" v-if="searchValue.length > 0">
                 <div v-if="!loading" class="search-result__body">
-                    <div class="search-result__games">
+                    <div class="search-result__list">
                         <h1>Games {{ searchResult.length }}</h1>
-                        <ul class="search-result__games-list">
+                        <ul class="search-result__list-item">
                             <li v-for="(game, idx) in searchResult" :key="idx" @click="pushToGamePage(game.id)">
-                                <div class="search-result__game-poster">
+                                <div class="search-result__image">
                                     <img :src="game.background_image" alt="">
                                 </div>
                                 <div class="search-result__game-text">
@@ -38,6 +38,15 @@
                                         </div>
                                     </div>
                                 </div>
+                            </li>
+                        </ul>
+                        <h2>Users {{ userResults.length }}</h2>
+                        <ul class="search-result__list-item">
+                            <li @click="pushToUserPage(user.displayName)" v-for="(user, idx) in userResults" :idx="idx">
+                                <div class="search-result__user-image">
+                                    <img :src="user.avatar" alt="avatar">
+                                </div>
+                                <div class="search-result__user-name">{{ user.displayName }}</div>
                             </li>
                         </ul>
                     </div>
@@ -75,7 +84,7 @@
             <div v-if="logged" class="navigation__user-profile">
                 <RouterLink :to="{ name: routeNames.Profile }">
                     <div>
-                        <img :src="currentUser.photoURL" alt="avatar">
+                        <img :src="avatar.get()" alt="avatar">
                         <p>My games</p>
                     </div>
                 </RouterLink>
@@ -117,15 +126,18 @@ import WindowsIcon from '../assets/ico/gameCard/WindowsIcon.vue'
 import SwitchIcon from '../assets/ico/gameCard/SwitchIcon.vue'
 
 import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { onClickOutside } from '@vueuse/core'
 import { ref, watchEffect } from 'vue';
 import { routeNames } from '../router/routeNames';
-import { auth } from '../firebase/config';
+import { auth, db } from '../firebase/config';
 import router from '../router/router';
+import { useAvatar } from '../assets/utils';
 
-type CurrentUser = {
-    photoURL: string | undefined
-}
+type userResultsType = {
+    displayName: string,
+    avatar: string,
+}[]
 
 type gameList = Array<{
     background_image: string,
@@ -146,16 +158,15 @@ type game = {
     }>,
 }
 
+const avatar = useAvatar()
 const searchValue = ref('')
 const API_KEY = "e0bd00b887d44e569f95cce1824ffd92"
 const search_box = ref<HTMLDivElement>()
 const loading = ref(true)
 const logged = ref(false)
-const currentUser = ref<CurrentUser>({
-    photoURL: "",
-})
 const navSettings = ref<HTMLDivElement>()
 const settingsShow = ref(false)
+const currentUser = ref()
 const searchResult = ref<gameList>([
     {
         background_image: "",
@@ -169,6 +180,10 @@ const searchResult = ref<gameList>([
     }
 ])
 
+const userResults = ref<userResultsType>([{
+    displayName: "",
+    avatar: ""
+}])
 watchEffect((onInvalidate) => {
     if (searchValue.value.length > 0) {
         loading.value = true
@@ -177,8 +192,19 @@ watchEffect((onInvalidate) => {
                 let data
                 const searchResponse = await fetch(`https://api.rawg.io/api/games?key=${API_KEY}&search=${searchValue.value}&page_size=10`)
                 data = await searchResponse.json()
+                const users = query(collection(db, 'users'), where('displayName', '==', searchValue.value))
+                const userResult = await getDocs(users)
+                const arrUsers = <userResultsType>[]
+                userResult.forEach((user) => {
+                    const userRef = {
+                        avatar: user.data().avatar,
+                        displayName: user.data().displayName
+                    }
+                    arrUsers.push(userRef)
+                })
+                userResults.value = arrUsers
+
                 searchResult.value = data.results
-                console.log(searchResult.value)
             }
             finally {
                 loading.value = false
@@ -205,8 +231,25 @@ watchEffect((onInvalidate) => {
     }
 })
 
+
+
 const pushToGamePage = (id: number) => {
     router.replace({ name: routeNames.GamePage, params: { gameId: id } })
+    searchValue.value = ""
+}
+const pushToUserPage = (userNickname: string) => {
+    if (currentUser.value != null) {
+        if (userNickname === currentUser.value.displayName) {
+            router.replace({ name: routeNames.Profile })
+            console.log("users", userNickname);
+            console.log(currentUser.value.displayName);
+        } else {
+            console.log("users", userNickname);
+            router.replace({ name: routeNames.UsersProfile, params: { userId: userNickname } })
+        }
+    } else {
+        router.replace({ name: routeNames.UsersProfile, params: { userId: userNickname } });
+    }
     searchValue.value = ""
 }
 
@@ -225,8 +268,9 @@ const logOut = () => {
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
+        currentUser.value = user
         if (user.photoURL != null) {
-            currentUser.value.photoURL = user.photoURL
+            avatar.set(user.photoURL)
         }
         logged.value = true
     } else {

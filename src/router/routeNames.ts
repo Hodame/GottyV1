@@ -12,4 +12,8 @@ export const routeNames = {
     ProfileSettings: "ProfileSettings",
     EmailSettings: "EmailSettings",
     PasswordSettings: "PasswordSettings",
+    UsersProfile: "UsersProfile",
+    UsersGames: "UsersGames",
+    ProfileGames: "ProfileGames",
+    ProfileCollections: "ProfileCollections"
 }

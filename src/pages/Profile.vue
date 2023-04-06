@@ -2,7 +2,7 @@
 	<div class="user-page">
 		<div class="user-page__info">
 			<div class="user-page__avatar">
-				<img :src="currentUser.photoURL" alt="">
+				<img :src="avatar.get()" alt="">
 			</div>
 			<div class="user-page__id">@{{ currentUser.displayName }}</div>
 			<RouterLink :to="{ name: routeNames.Settings }">
@@ -12,9 +12,16 @@
 			</RouterLink>
 		</div>
 		<div class="user-page__tabs">
-			<div class="user-page__tab">Games</div>
-			<div class="user-page__tab">Collection</div>
-			<div class="user-page__tab">Reviews</div>
+			<RouterLink :to="{ name: routeNames.ProfileGames }">
+				<div :style="{ color: route.name === routeNames.ProfileGames ? 'var(--lRed)' : '' }" class="user-page__tab">Games
+				</div>
+			</RouterLink>
+			<RouterLink :to="{ name: routeNames.ProfileCollections}">
+				<div :style="{ color: route.name === routeNames.ProfileCollections ? 'var(--lRed)' : '' }"
+					class="user-page__tab">Collection</div>
+			</RouterLink>
+			<div :style="{ color: route.name === routeNames.ProfileSettings ? 'var(--lRed)' : '' }" class="user-page__tab">
+				Reviews</div>
 		</div>
 		<RouterView />
 	</div>
@@ -25,12 +32,15 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase/config';
 import { ref } from 'vue';
 import { routeNames } from '../router/routeNames';
-
+import { useAvatar } from '../assets/utils';
+import { useRoute } from 'vue-router';
 type CurrentUser = {
 	displayName: string | null,
 	photoURL: string | undefined
 }
 
+const avatar = useAvatar()
+const route = useRoute()
 const logged = ref(false)
 const currentUser = ref<CurrentUser>({
 	displayName: "",
@@ -40,7 +50,7 @@ onAuthStateChanged(auth, (user) => {
 	if (user) {
 		currentUser.value.displayName = user.displayName
 		if (user.photoURL != null) {
-			currentUser.value.photoURL = user.photoURL
+			avatar.set(user.photoURL)
 		}
 		logged.value = true
 	} else {
@@ -92,6 +102,9 @@ onAuthStateChanged(auth, (user) => {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		a {
+			width: 100%;
+		}
 	}
 
 	&__tab {
@@ -120,5 +133,4 @@ onAuthStateChanged(auth, (user) => {
 			color: var(--lRed);
 		}
 	}
-}
-</style>
+}</style>
