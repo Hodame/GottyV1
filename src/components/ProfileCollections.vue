@@ -5,23 +5,27 @@
 			<h2>Create a new collection</h2>
 			<div class="collections__inputs">
 				<div class="collections__input-box">
-					<input placeholder="Name" type="text" name="create" id="create">
+					<input v-model="nameCollection" placeholder="Name (required)" type="text" name="create" id="create">
 				</div>
 				<div class="collections__input-box">
-					<input placeholder="Description" type="text" name="create" id="create">
+					<input v-model="descriptionCollection" placeholder="Description" type="text" name="create" id="create">
 				</div>
 			</div>
 			<div class="collections__costomize">
-				<ul class="collections__choose-bg">
-					<li @click="selectedColor = color.id" v-for="(color, idx) in colors"
-						:class="{ selected: selectedColor == color.id }" :key="idx">
-						<div>
-							<span :style="{ backgroundColor: color.color }"></span>
-						</div>
-					</li>
-				</ul>
+				<div class="collections__bg-div">
+					<h2>Select color</h2>
+					<ul class="collections__choose-bg">
+						<li @click="selectedColor == color ? selectedColor = { color: '', id: '' } : selectedColor = color"
+							v-for="(color, idx) in colors" :class="{ selected: selectedColor.id == color.id }" :key="idx">
+							<div>
+								<span :style="{ backgroundColor: color.color }"></span>
+							</div>
+						</li>
+					</ul>
+				</div>
 				<div class="collections__upload-img">
-					<input type="file" name="bg" id="bg">
+					<h2>Select background image</h2>
+					<input @change="uploadedImg" type="file" name="bg" id="bg">
 					<label for="bg">
 						<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 512 512">
 							<path :fill="'var(--lRed)'"
@@ -30,28 +34,20 @@
 					</label>
 				</div>
 			</div>
-
-			<button>Create collection</button>
+			<button @click="addCollection">Create collection</button>
 		</div>
 
 		<ul class="collections__items">
-			<li class="collections__item">
-				<!-- backgraund gradient -->
-				<div :style="{ background: 'var(--lRed)' }" class="collections__background">
+			<li v-for="(collection, idx) in userCollections" :key="idx" class="collections__item">
+				<div :style="{ background: collection.collectionColor.color }" class="collections__background">
+					<img v-if="collection.backgroundIMG" :src="collection.backgroundIMG" alt="">
 				</div>
 				<div class="collections__info">
-					<div class="collections__name">YouTube</div>
-					<div class="collections__description">Games that i watched on YouTube</div>
-					<div class="collections__games-count">10</div>
-				</div>
-			</li>
-			<li class="collections__item">
-				<div :style="{ background: 'var(--mRed)' }" class="collections__background">
-				</div>
-				<div class="collections__info">
-					<div class="collections__name">YouTube</div>
-					<div class="collections__description">Games that i watched on YouTube</div>
-					<div class="collections__games-count">10</div>
+					<div class="collections__name">{{ collection.collectionName }}</div>
+					<div class="collections__description"><span>{{ collection.collectionDescription }}</span></div>
+					<div class="collections__games-count"><img src="../assets/ico/profile/gamepad.svg"
+							alt=""><span>10</span>
+					</div>
 				</div>
 			</li>
 		</ul>
@@ -59,8 +55,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { QuerySnapshot, addDoc, collection, doc, onSnapshot } from 'firebase/firestore';
+import { onMounted, ref } from 'vue';
+import { db, storage } from '../firebase/config';
+import { ref as refStorage, uploadString, getDownloadURL } from 'firebase/storage';
+import { getCurrentUserData } from "../helpers/"
 
+type UserCollections = Array<{
+	collectionName: string,
+	collectionDescription: string,
+	collectionColor: {
+		color: string,
+		id: string
+	},
+	backgroundIMG: string | null,
+	postLifeTime: number,
+}>
 
 const colors = ref([
 	{
@@ -84,5 +94,102 @@ const colors = ref([
 		id: "4"
 	},
 ])
-const selectedColor = ref("")
+const selectedColor = ref({
+	id: "",
+	color: ""
+})
+const nameCollection = ref("")
+const descriptionCollection = ref("")
+const collectionIMG = ref("")
+const currentUser = getCurrentUserData()
+const userCollections = ref<UserCollections>([
+	{
+		collectionName: "",
+		collectionDescription: "",
+		collectionColor: {
+			color: "",
+			id: ''
+		},
+		backgroundIMG: "",
+		postLifeTime: 0,
+	}
+])
+
+const uploadedImg = (e: Event) => {
+	const image = (<HTMLInputElement>e.target).files
+	let fileReader = new FileReader()
+
+	fileReader.onload = function (event) {
+		if (typeof event.target?.result === "string") {
+			collectionIMG.value = event.target.result
+		}
+	}
+	if (image != null) {
+		fileReader.readAsDataURL(image[0])
+	}
+}
+
+const uploadToFirebase = (ref: any) => uploadString(ref, collectionIMG.value, 'data_url')
+
+const getCollections = () => {
+	onSnapshot(collection(db, 'users', currentUser.get().uid, 'collections'), (collections) => {
+		const results = <UserCollections>[]
+		collections.forEach((doc) => {
+			const result = {
+				collectionName: doc.data().collectionName,
+				collectionDescription: doc.data().collectionDescription,
+				collectionColor: doc.data().collectionColor,
+				backgroundIMG: doc.data().backgroundIMG,
+				postLifeTime: doc.data().postLifeTime,
+			}
+			results.push(result)
+		})
+		userCollections.value = results.sort((collection, collection2) => collection2.postLifeTime - collection.postLifeTime)
+	})
+}
+
+const addCollection = async () => {
+	if (currentUser.get().uid != null) {
+		if (typeof userCollections.value.find(obj => obj.collectionName == nameCollection.value) == "undefined") {
+			if (nameCollection.value != "") {
+				if (selectedColor.value.color != '' || collectionIMG.value != "") {
+					const userUid = currentUser.get().uid
+					const userCollectionImgRef = refStorage(storage, 'usersCollectionsBackgroundImages/' + currentUser.get().displayName + nameCollection.value + 'UserCollectionImgBg.jpg')
+					if (collectionIMG.value != "") {
+						await uploadToFirebase(userCollectionImgRef)
+							.then(async () => {
+								let image = await getDownloadURL(userCollectionImgRef)
+								await addDoc(collection(db, "users", userUid, "collections"), {
+									collectionName: nameCollection.value,
+									collectionDescription: descriptionCollection.value,
+									collectionColor: selectedColor.value,
+									backgroundIMG: image,
+									postLifeTime: new Date().getTime(),
+								})
+							})
+					} else {
+						await addDoc(collection(db, "users", userUid, "collections"), {
+							collectionName: nameCollection.value,
+							collectionDescription: descriptionCollection.value,
+							collectionColor: selectedColor.value,
+							backgroundIMG: "",
+							postLifeTime: new Date().getTime(),
+						})
+					}
+				} else {
+					alert('choose color or image')
+				}
+				collectionIMG.value = ""
+			} else {
+				alert('please select name')
+			}
+		}
+		else {
+			alert("this collection name alredy exists")
+		}
+	}
+}
+
+onMounted(getCollections)
+
 </script>

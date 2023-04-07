@@ -15,7 +15,7 @@
 					</div>
 					<button>See all</button>
 				</div>
-				<swiper :slides-per-view="3" :space-between="20" class="user-games__list">
+				<swiper :slides-per-view="3.1" :space-between="20" class="user-games__list">
 					<swiper-slide v-for="(game, idx) in gamesWant" :key="idx" class="user-games__game">
 						<RouterLink :to="{ name: routeNames.GamePage, params: { gameId: game.gameId } }">
 							<div class="user-games__game-body">
@@ -44,7 +44,7 @@
 					</div>
 					<button>See all</button>
 				</div>
-				<swiper :slides-per-view="3" :space-between="20" class="user-games__list">
+				<swiper :slides-per-view="3.1" :space-between="20" class="user-games__list">
 					<swiper-slide v-for="(game, idx) in gamesPlaying" :key="idx" class="user-games__game">
 						<RouterLink :to="{ name: routeNames.GamePage, params: { gameId: game.gameId } }">
 							<div class="user-games__game-body">
@@ -73,7 +73,7 @@
 					</div>
 					<button>See all</button>
 				</div>
-				<swiper :slides-per-view="3" :space-between="20" class="user-games__list">
+				<swiper :slides-per-view="3.1" :space-between="20" class="user-games__list">
 					<swiper-slide v-for="(game, idx) in gamesBeaten" :key="idx" class="user-games__game">
 						<RouterLink :to="{ name: routeNames.GamePage, params: { gameId: game.gameId } }">
 							<div class="user-games__game-body">
