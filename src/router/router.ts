@@ -59,8 +59,13 @@ const router = createRouter({
                         {
                             path: "/profile/collections",
                             name: routeNames.ProfileCollections,
-                            component: () => import("../components/ProfileCollections.vue")
+                            component: () => import("../components/ProfileCollections.vue"),
                         },
+                        {
+                            path: "/profile/collections/:collectionName",
+                            name: routeNames.ProfileCollection,
+                            component: () => import('../pages/CollectionPage.vue')
+                        }
                     ]
                 },
                 {

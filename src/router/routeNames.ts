@@ -15,5 +15,6 @@ export const routeNames = {
     UsersProfile: "UsersProfile",
     UsersGames: "UsersGames",
     ProfileGames: "ProfileGames",
-    ProfileCollections: "ProfileCollections"
+    ProfileCollections: "ProfileCollections",
+    ProfileCollection: "ProfileCollection"
 }

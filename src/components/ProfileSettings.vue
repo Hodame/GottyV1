@@ -78,7 +78,7 @@ onAuthStateChanged(auth, async (user) => {
 
 watch(userAvatarFile, () => {
 	onAuthStateChanged(auth, async (user) => {
-		const uploadedAvatar = storageRef(storage, currentUser.value.displayName + "UserAvatar.jpg")
+		const uploadedAvatar = storageRef(storage, "UserAvatars/" + currentUser.value.displayName + "UserAvatar.jpg")
 		uploadString(uploadedAvatar, userAvatarFile.value, "data_url")
 		if (user) {
 			getDownloadURL(uploadedAvatar)

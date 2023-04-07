@@ -137,7 +137,7 @@
         border-radius: 10px;
         background-color: var(--dRed);
         position: relative;
-            overflow: hidden;
+        overflow: hidden;
         svg {
             position: relative;
             z-index: 10;
@@ -172,6 +172,85 @@
             &::after {
                 transform: scale(1);
             }
+        }
+    }
+
+    &__collection-button {
+        margin-top: 10px;
+        user-select: none;
+        position: relative;
+    }
+
+    &__collection-popup {
+        top: 100%;
+        left: 0;
+        position: absolute;
+        margin-top: 10px;
+        border-radius: 10px;
+        max-height: calc((100px * 5) + (5px * 5));
+        background-color: var(--dRed);
+        padding-right: 5px;
+        ul {
+            overflow: auto;
+            max-height: calc((100px * 5) + (5px * 5));
+            &::-webkit-scrollbar {
+                width: 10px;
+            }
+
+            &::-webkit-scrollbar-track {
+                margin: 20px;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                cursor: pointer;
+                background-color: var(--black);
+                border-radius: 9999px;
+            }
+        }
+    }
+
+    &__item {
+        cursor: pointer;
+        display: flex;
+        width: 100%;
+        height: 100px;
+        padding: 10px;
+    }
+
+    &__collection-bg {
+        margin-right: 10px;
+        width: 30%;
+        height: 100%;
+        border-radius: 10px;
+        overflow: hidden;
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &__info {
+        width: 60%;
+    }
+
+    &__name {
+        font-weight: 600;
+    }
+
+    &__collection-description {
+        margin: 6px 0 0 0;
+        font-weight: 14px;
+    }
+
+    &__games-count {
+        margin: 10px 0 0 0;
+        display: flex;
+        align-items: center;
+        img {
+            margin-right: 5px;
+            width: 20px;
+            height: 20px;
         }
     }
 

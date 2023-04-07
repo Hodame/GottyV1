@@ -38,7 +38,8 @@
 		</div>
 
 		<ul class="collections__items">
-			<li v-for="(collection, idx) in userCollections" :key="idx" class="collections__item">
+			<li @click="openCollection(collection.collectionName)" v-for="(collection, idx) in userCollections" :key="idx"
+				class="collections__item">
 				<div :style="{ background: collection.collectionColor.color }" class="collections__background">
 					<img v-if="collection.backgroundIMG" :src="collection.backgroundIMG" alt="">
 				</div>
@@ -55,11 +56,13 @@
 </template>
 
 <script setup lang="ts">
-import { QuerySnapshot, addDoc, collection, doc, onSnapshot } from 'firebase/firestore';
+import { addDoc, collection, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { onMounted, ref } from 'vue';
 import { db, storage } from '../firebase/config';
 import { ref as refStorage, uploadString, getDownloadURL } from 'firebase/storage';
 import { getCurrentUserData } from "../helpers/"
+import router from '../router/router';
+import { routeNames } from '../router/routeNames';
 
 type UserCollections = Array<{
 	collectionName: string,
@@ -166,6 +169,18 @@ const addCollection = async () => {
 									backgroundIMG: image,
 									postLifeTime: new Date().getTime(),
 								})
+									.then(async (docRef) => {
+										await updateDoc(doc(db, "users", currentUser.get().uid, "collections", docRef.id), {
+											collectionUid: docRef.id
+										})
+										selectedColor.value = {
+											id: "",
+											color: ""
+										}
+										nameCollection.value = ""
+										descriptionCollection.value = ""
+										collectionIMG.value = ""
+									})
 							})
 					} else {
 						await addDoc(collection(db, "users", userUid, "collections"), {
@@ -175,6 +190,18 @@ const addCollection = async () => {
 							backgroundIMG: "",
 							postLifeTime: new Date().getTime(),
 						})
+							.then(async (docRef) => {
+								await updateDoc(doc(db, "users", currentUser.get().uid, "collections", docRef.id), {
+									collectionUid: docRef.id
+								})
+								selectedColor.value = {
+									id: "",
+									color: ""
+								}
+								nameCollection.value = ""
+								descriptionCollection.value = ""
+								collectionIMG.value = ""
+							})
 					}
 				} else {
 					alert('choose color or image')
@@ -188,6 +215,10 @@ const addCollection = async () => {
 			alert("this collection name alredy exists")
 		}
 	}
+}
+
+const openCollection = (name: string) => {
+	router.push({ name: routeNames.ProfileCollection, params: { collectionName: name } })
 }
 
 onMounted(getCollections)

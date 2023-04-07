@@ -44,6 +44,29 @@
                     </div>
                 </template>
             </div>
+            <div class="game-page__collection-button">
+                <template v-if="!currentUser.unLogged">
+                    <div @click="collectionPopup = !collectionPopup" class="game-page__button add-mygames">
+                        <p>Add to collection</p>
+                    </div>
+                    <div v-show="collectionPopup" class="game-page__collection-popup" ref="collectionPopupRef">
+                        <ul>
+                            <li @click="addToCollection(collection.collectionUid)"
+                                v-for="(collection, idx) in userCollections" :key="idx" class="game-page__item">
+                                <div :style="{ background: collection.collectionColor.color }"
+                                    class="game-page__collection-bg">
+                                    <img v-if="collection.backgroundIMG" :src="collection.backgroundIMG" alt="">
+                                </div>
+                                <div class="game-page__info">
+                                    <div class="game-page__name">{{ collection.collectionName }}</div>
+                                    <div class="game-page__collection-description"><span>{{ collection.collectionDescription
+                                    }}</span></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </template>
+            </div>
             <div class="game-page__about">
                 <h1>About</h1>
                 <div v-if="gameInfo.description_raw.length > 562" class="game-page__description">
@@ -249,6 +272,18 @@ type gameInUserCollectionType = {
     gameMetacritic?: number | null,
 }
 
+type UserCollections = Array<{
+    collectionName: string,
+    collectionDescription: string,
+    collectionColor: {
+        color: string,
+        id: string
+    },
+    backgroundIMG: string | null,
+    postLifeTime: number,
+    collectionUid: string,
+}>
+
 
 const route = useRoute()
 const gameScreens = ref<gameScreen>({
@@ -325,6 +360,20 @@ const gameInUserCollection = ref<gameInUserCollectionType>({
     userReview: "",
     docUid: ""
 })
+const userCollections = ref<UserCollections>([
+    {
+        collectionName: "",
+        collectionDescription: "",
+        collectionColor: {
+            color: "",
+            id: ''
+        },
+        backgroundIMG: "",
+        postLifeTime: 0,
+        collectionUid: ""
+    }
+])
+
 const readMoreValue = ref(false)
 const API_KEY = "e0bd00b887d44e569f95cce1824ffd92"
 const currentUser = ref<{ uid?: string, unLogged?: boolean }>({
@@ -335,9 +384,11 @@ const selectedRating = ref("No")
 const userReview = ref("")
 const popupOpened = ref(false)
 const addGameToCollectionPopup = ref<HTMLDivElement>()
+const collectionPopupRef = ref<HTMLDivElement>()
 const loading = ref(true)
 const buttonLoading = ref(false)
 const deleteButtonShow = ref(false)
+const collectionPopup = ref(false)
 onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUser.value = user
@@ -396,6 +447,20 @@ const loadContent = async () => {
                     ifGameHasInUserCollection.value.push(gameRes)
                 })
 
+                const collections = await getDocs(collection(db, 'users', currentUser.value.uid, 'collections'))
+                const results = <UserCollections>[]
+                collections.forEach((doc) => {
+                    const response = {
+                        collectionName: doc.data().collectionName,
+                        collectionDescription: doc.data().collectionDescription,
+                        collectionColor: doc.data().collectionColor,
+                        backgroundIMG: doc.data().backgroundIMG,
+                        postLifeTime: doc.data().postLifeTime,
+                        collectionUid: doc.data().collectionUid
+                    }
+                    results.push(response)
+                })
+                userCollections.value = results
             }
             catch (error) {
                 console.log("Erorr" + error);
@@ -411,7 +476,7 @@ const loadContent = async () => {
                 selectedCollection.value = gameInUserCollection.value.collection
                 userReview.value = gameInUserCollection.value.userReview
                 deleteButtonShow.value = true
-            } else {                
+            } else {
                 selectedCollection.value = ""
                 gameInUserCollection.value.userRating = ""
                 gameInUserCollection.value.collection = ""
@@ -582,11 +647,36 @@ const removeGameFromCollection = async () => {
     }
 }
 
+const addToCollection = async function(collectionRef: string) {
+    try {
+        const userId = currentUser.value.uid
+        const requestRef = collection(db, 'users', userId as string, "collections", collectionRef, "games")
+        await addDoc(requestRef, {
+            background_image: gameInfo.value.background_image,
+            id: gameInfo.value.id,
+            metacritic: gameInfo.value.metacritic,
+            name: gameInfo.value.name,
+            released: gameInfo.value.released,
+        })
+            .then(function(docRef) {
+                const requestRefId = doc(db, 'users', userId as string, "collections", collectionRef, "games", docRef.id)
+                updateDoc(requestRefId, {
+                    gameCollectionUid: docRef.id
+                })
+            })
+        collectionPopup.value = false
+    }
+    finally {
+
+    }
+}
+
 const redirectToAuth = () => {
     router.replace({ name: routeNames.Auth })
 }
 
 onClickOutside(addGameToCollectionPopup, () => popupOpened.value = false)
+onClickOutside(collectionPopupRef, () => collectionPopup.value = false)
 </script> 
 
 <style scoped lang="scss">
