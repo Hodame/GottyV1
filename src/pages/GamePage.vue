@@ -44,7 +44,7 @@
                     </div>
                 </template>
             </div>
-            <div class="game-page__collection-button">
+            <!-- <div class="game-page__collection-button">
                 <template v-if="!currentUser.unLogged">
                     <div @click="collectionPopup = !collectionPopup" class="game-page__button add-mygames">
                         <p>Add to collection</p>
@@ -66,7 +66,7 @@
                         </ul>
                     </div>
                 </template>
-            </div>
+            </div> -->
             <div class="game-page__about">
                 <h1>About</h1>
                 <div v-if="gameInfo.description_raw.length > 562" class="game-page__description">
@@ -80,6 +80,30 @@
                 <div v-else class="game-page__description-raw">
                     <div v-html="gameInfo.description_raw">
                     </div>
+                </div>
+            </div>
+            <div class="game-page__collections">
+                <h1>Add to collections</h1>
+                <div class="game-page__collections-body" ref="collectionsRef">
+                    <ul>
+                        <li @click="addToCollection(collection.collectionUid)" v-for="(collection, idx) in userCollections"
+                            :key="idx" class="game-page__item">
+                            <div class="game-page__item-body">
+                                <div :style="{ background: collection.collectionColor.color }"
+                                    class="game-page__collection-bg">
+                                    <img v-if="collection.backgroundIMG" :src="collection.backgroundIMG" alt="">
+                                </div>
+                                <div class="game-page__info">
+                                    <div class="game-page__name">{{ collection.collectionName }}</div>
+                                    <div class="game-page__collection-description"><span>{{ collection.collectionDescription
+                                    }}</span></div>
+                                </div>
+                            </div>
+                            <div class="game-page__addto-collection">
+                                <i class="fas fa-plus"></i> 
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -373,7 +397,19 @@ const userCollections = ref<UserCollections>([
         collectionUid: ""
     }
 ])
-
+const collectionsWhereTheGameIs = ref<UserCollections>([
+    {
+        collectionName: "",
+        collectionDescription: "",
+        collectionColor: {
+            color: "",
+            id: ''
+        },
+        backgroundIMG: "",
+        postLifeTime: 0,
+        collectionUid: ""
+    }
+])
 const readMoreValue = ref(false)
 const API_KEY = "e0bd00b887d44e569f95cce1824ffd92"
 const currentUser = ref<{ uid?: string, unLogged?: boolean }>({
@@ -647,7 +683,7 @@ const removeGameFromCollection = async () => {
     }
 }
 
-const addToCollection = async function(collectionRef: string) {
+const addToCollection = async function (collectionRef: string) {
     try {
         const userId = currentUser.value.uid
         const requestRef = collection(db, 'users', userId as string, "collections", collectionRef, "games")
@@ -658,7 +694,7 @@ const addToCollection = async function(collectionRef: string) {
             name: gameInfo.value.name,
             released: gameInfo.value.released,
         })
-            .then(function(docRef) {
+            .then(function (docRef) {
                 const requestRefId = doc(db, 'users', userId as string, "collections", collectionRef, "games", docRef.id)
                 updateDoc(requestRefId, {
                     gameCollectionUid: docRef.id

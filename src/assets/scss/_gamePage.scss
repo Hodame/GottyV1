@@ -3,6 +3,7 @@
     display: flex;
     justify-content: center;
     gap: 30px;
+
     &__background {
         position: absolute;
         top: 0;
@@ -92,12 +93,15 @@
         font-weight: 500;
         color: var(--white);
         transition: 0.3s ease;
+
         &.unlogged {
             flex: 0 0 100%;
         }
+
         &.not-in-collection {
             flex: 0 0 100%;
         }
+
         p {
             position: relative;
             z-index: 10;
@@ -138,6 +142,7 @@
         background-color: var(--dRed);
         position: relative;
         overflow: hidden;
+
         svg {
             position: relative;
             z-index: 10;
@@ -169,19 +174,24 @@
                     fill: var(--black);
                 }
             }
+
             &::after {
                 transform: scale(1);
             }
         }
     }
 
-    &__collection-button {
-        margin-top: 10px;
-        user-select: none;
-        position: relative;
+    &__collections {
+        margin-top: 20px;
+
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
     }
 
-    &__collection-popup {
+    &__collections-body {
         top: 100%;
         left: 0;
         position: absolute;
@@ -190,9 +200,13 @@
         max-height: calc((100px * 5) + (5px * 5));
         background-color: var(--dRed);
         padding-right: 5px;
+        width: 100%;
+
         ul {
+            padding: 10px;
             overflow: auto;
             max-height: calc((100px * 5) + (5px * 5));
+
             &::-webkit-scrollbar {
                 width: 10px;
             }
@@ -210,11 +224,22 @@
     }
 
     &__item {
-        cursor: pointer;
         display: flex;
         width: 100%;
         height: 100px;
+        margin-bottom: 5px;
+    }
+
+    &__item-body {
+        cursor: pointer;
+        display: flex;
+        width: 100%;
+        border-radius: 10px;
         padding: 10px;
+        margin-right: 5px;
+        &:hover {
+            background-color: var(--mBlack);
+        }
     }
 
     &__collection-bg {
@@ -223,6 +248,7 @@
         height: 100%;
         border-radius: 10px;
         overflow: hidden;
+
         img {
             width: 100%;
             height: 100%;
@@ -247,12 +273,26 @@
         margin: 10px 0 0 0;
         display: flex;
         align-items: center;
+
         img {
             margin-right: 5px;
             width: 20px;
             height: 20px;
         }
     }
+
+    &__addto-collection {
+        cursor: pointer;
+        width: 100PX;
+        font-size: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--white);
+        border-radius: 10px;
+        color: var(--dRed);
+    }
+
 
     &__about {
         margin-top: 30px;
